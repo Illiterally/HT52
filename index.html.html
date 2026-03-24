@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Card Lane Battler - Fixed Opening Turn</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #1a1a1a; color: #fff; display: flex; flex-direction: column; align-items: center; padding: 20px; margin: 0; overflow-x: hidden; overflow-y: auto; }
+        
+        /* Selection Screen */
+        #selection-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #111; z-index: 200; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .select-box { display: flex; gap: 40px; margin-top: 30px; }
+        .side-btn { width: 220px; height: 280px; border-radius: 15px; cursor: pointer; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 4px solid transparent; transition: 0.3s; background: #222; }
+        .side-btn:hover { transform: scale(1.05); }
+        .side-btn.blue { border-color: #4dabf7; color: #4dabf7; }
+        .side-btn.red { border-color: #ff6b6b; color: #ff6b6b; }
+        .side-btn h2 { margin: 10px 0; font-size: 2rem; }
+        .side-btn p { font-size: 0.85rem; color: #aaa; text-align: center; }
+        .mode-select-wrap { margin-top: 18px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+        .mode-select-label { font-size: 0.9rem; letter-spacing: 0.08em; color: #aaa; text-transform: uppercase; }
+        .mode-select { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+        .mode-option { display: flex; align-items: center; gap: 8px; background: #222; border: 1px solid #444; border-radius: 999px; padding: 8px 14px; color: #ddd; cursor: pointer; user-select: none; }
+        .mode-option input { accent-color: #00aa00; }
+        .mode-option:hover { border-color: #666; }
+
+        /* Header Layout */
+        .header { display: flex; justify-content: space-between; align-items: center; width: 700px; margin-bottom: 20px; padding: 15px 25px; background: #2d2d2d; border-radius: 8px; border: 1px solid #444; box-sizing: border-box;}
+        .header-left, .header-right { display: flex; align-items: center; }
+        .header-left { min-width: 150px; }
+        .header-right { min-width: 220px; justify-content: flex-end; gap: 18px; }
+        .p2-stats { font-weight: bold; min-width: 150px; }
+        .p1-stats { font-weight: bold; min-width: 150px; text-align: right; }
+        .turn-indicator { font-size: 1.2rem; font-weight: bold; color: #00aa00; flex-grow: 1; text-align: center; }
+        
+        .auto-advance-wrap { display: flex; align-items: center; gap: 8px; font-size: 0.75rem; color: #aaa; flex-shrink: 0; }
+        .side-auto-wrap { justify-content: space-between; background: #2d2d2d; border: 1px solid #444; border-radius: 8px; padding: 6px 10px; width: 100px; box-sizing: border-box; }
+
+        /* Board */
+        .board-shell { position: relative; width: 760px; display: flex; justify-content: center; align-items: center; }
+        .board { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; background: #333; padding: 12px; border-radius: 8px; width: 600px; height: 560px; box-sizing: border-box; border: 2px solid #444; position: relative; overflow: hidden;}
+        .side-hp { position: absolute; top: 50%; transform: translateY(-50%); width: 70px; display: flex; flex-direction: column; align-items: center; gap: 6px; pointer-events: none; }
+        .side-hp.left { left: 0; }
+        .side-hp.right { right: 0; }
+        .side-hp-label { font-size: 0.8rem; font-weight: bold; letter-spacing: 0.08em; color: #aaa; text-align: center; }
+        .side-hp-value { font-size: 3.2rem; font-weight: 900; line-height: 1; text-align: center; }
+        .cell { background: #444; border-radius: 4px; display: flex; justify-content: center; align-items: center; position: relative; border: 1px solid #555; height: 58px; min-height: 58px;}
+        
+        /* Zone Coloring */
+        .zone-red { border: 2px solid #ff6b6b; background: #3a2525; }
+        .zone-blue { border: 2px solid #4dabf7; background: #1e2a38; }
+        .trail-p1-blue { background: #21466b; }
+        .trail-p1-red { background: #5a2a2a; }
+        .trail-p2-blue { background: #21466b; }
+        .trail-p2-red { background: #5a2a2a; }
+
+        .card { background: white; border-radius: 6px; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; box-shadow: 0 4px 8px rgba(0,0,0,0.5); font-weight: bold; position: relative; width: 85%; height: 90%; color: #2d3436; transition: 0.2s; pointer-events: none; overflow: hidden;}
+        .board .card-dir { position: absolute; left: 8px; top: 50%; transform: translateY(-50%); font-size: 1rem; line-height: 1; }
+        .board .card-rank-suit { position: absolute; right: 7px; top: 5px; font-size: 0.9rem; line-height: 1; text-align: right; }
+        .board .card-stock { position: absolute; left: 50%; bottom: 4px; transform: translateX(-50%); font-size: 1.75rem; font-weight: 900; line-height: 1; color: inherit; }
+        .card-stock.damaged { color: #00aa00; }
+        .hand .card-top { display: flex; flex-direction: column; align-items: center; justify-content: center; margin-top: 10px; line-height: 1; }
+        .hand .card-rank-suit { font-size: 1rem; }
+        .hand .card-stock { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -36%); font-size: 1.75rem; font-weight: 900; line-height: 1; color: inherit; }
+        .card.red-suit { color: #d63031; }
+        .card.black-suit { color: #2d3436; }
+        .ace-card { border: 2px solid #00aa00; box-shadow: 0 0 10px #00aa00 !important; }
+        
+        .border-blue { border-bottom: 4px solid #4dabf7; }
+        .border-red { border-bottom: 4px solid #ff6b6b; }
+        .border-ai-blue { border-top: 4px solid #4dabf7; }
+        .border-ai-red { border-top: 4px solid #ff6b6b; }
+
+        .controls-area { display: flex; gap: 15px; margin-top: 20px; width: 700px; align-items: center; }
+        .btn-group { display: flex; flex-direction: column; gap: 8px; align-items: stretch; width: 100px; }
+        @keyframes nextTurnPulse {
+            0%   { box-shadow: 0 0 0 0 rgba(255,255,255,0.00), 0 4px 0 #0b6e0b; }
+            50%  { box-shadow: 0 0 0 6px rgba(255,255,255,0.35), 0 4px 0 #0b6e0b; }
+            100% { box-shadow: 0 0 0 0 rgba(255,255,255,0.00), 0 4px 0 #0b6e0b; }
+        }
+        .next-btn { width: 100px; height: 60px; font-size: 0.9rem; cursor: pointer; background: #00aa00; border: 3px solid transparent; border-radius: 8px; font-weight: 800; color: #fff; box-shadow: 0 4px 0 #0b6e0b; }
+        .next-btn.needs-manual { border-color: #ffffff; box-shadow: 0 0 0 4px rgba(255,255,255,0.22), 0 4px 0 #0b6e0b; animation: nextTurnPulse 1.2s ease-in-out infinite; }
+        .undo-btn { width: 100px; height: 30px; font-size: 0.75rem; cursor: pointer; background: #444; border: 1px solid #666; border-radius: 8px; color: #fff; }
+        
+        .hand { display: flex; gap: 8px; flex-grow: 1; background: #2d2d2d; padding: 10px; border-radius: 12px; height: 110px; align-items: center; justify-content: center; border: 1px solid #444; }
+        .hand .card { width: 60px; height: 86px; }
+        .hand .card { pointer-events: auto; width: 60px; height: 85px; cursor: pointer; }
+        .hand .card.selected { border: 3px solid #00aa00; transform: translateY(-10px); box-shadow: 0 0 15px #00aa00; }
+        
+        .log { margin-top: 15px; width: 700px; height: 70px; background: #000; border-radius: 8px; padding: 10px; overflow-y: auto; font-family: monospace; font-size: 0.75rem; color: #00ff41; border: 1px solid #333; box-sizing: border-box;}
+        #game-over { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 100; flex-direction: column; justify-content: center; align-items: center; }
+        .score-stack { display: flex; flex-direction: column; gap: 10px; align-items: center; margin: 10px 0 18px; }
+        .score-line { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+        .score-label { font-size: 0.85rem; letter-spacing: 0.06em; text-transform: uppercase; color: #b8b8b8; font-weight: 700; }
+        .score-values { font-size: 1.05rem; font-weight: 900; color: #fff; }
+        .score-left-blue { color: #4dabf7; }
+        .score-left-red { color: #ff6b6b; }
+        .score-right-blue { color: #4dabf7; }
+        .score-right-red { color: #ff6b6b; }
+        .score-sep { color: #e8e8e8; padding: 0 6px; }
+        .new-game-btn { padding: 10px 20px; cursor: pointer; background: #00aa00; border: none; border-radius: 8px; color: #fff; font-weight: 800; box-shadow: 0 4px 0 #0b6e0b; }
+        
+        /* Toggle Switch */
+        .switch { position: relative; display: inline-block; width: 34px; height: 18px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #444; transition: .4s; border-radius: 20px; }
+        .slider:before { position: absolute; content: ""; height: 12px; width: 12px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: #00aa00; }
+        input:checked + .slider:before { transform: translateX(16px); }
+    </style>
+</head>
+<body>
+
+    <div id="selection-screen">
+        <h1>Pick...</h1>
+        <div class="mode-select-wrap">
+            <div class="mode-select-label">Mode</div>
+            <div class="mode-select">
+                <label class="mode-option">
+                    <input type="radio" name="ai-mode" value="normal" checked>
+                    <span>Normal Mode</span>
+                </label>
+                <label class="mode-option">
+                    <input type="radio" name="ai-mode" value="cracked">
+                    <span>Possibly Cracked Mode</span>
+                </label>
+            </div>
+        </div>
+        <div class="select-box">
+            <div class="side-btn blue" onclick="startGame('blue')">
+                <h2>BLUE</h2>
+                <p>Moves First<br>Cards: Black</p>
+            </div>
+            <div class="side-btn red" onclick="startGame('red')">
+                <h2>RED</h2>
+                <p>Moves Second<br>Cards: Red</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="header">
+        <div class="header-left">
+            <div class="p2-stats" id="p2-label">AI: 20 HP</div>
+        </div>
+        <div id="turn-display" class="turn-indicator">Your Turn</div>
+        <div class="header-right">
+            <div class="p1-stats" id="p1-label">YOU: 20 HP</div>
+        </div>
+    </div>
+
+    <div class="board-shell">
+        <div class="side-hp left">
+            <div class="side-hp-label" id="p2-big-label">AI</div>
+            <div class="side-hp-value" id="p2-big-hp">20</div>
+        </div>
+
+        <div class="board" id="board">
+            <div id="game-over">
+                <h1 id="winner-text">Winner!</h1>
+                <div id="score-text" class="score-stack"><div class="score-line"><span class="score-label">Battle Score</span><span id="battle-score-values" class="score-values">0 • 0</span></div><div class="score-line"><span class="score-label">Final Score</span><span id="final-score-values" class="score-values">0 • 0</span></div></div>
+                <button class="new-game-btn" onclick="location.reload()">New Game</button>
+            </div>
+        </div>
+
+        <div class="side-hp right">
+            <div class="side-hp-label" id="p1-big-label">YOU</div>
+            <div class="side-hp-value" id="p1-big-hp">20</div>
+        </div>
+    </div>
+
+    <div class="controls-area">
+        <div class="btn-group">
+            <div class="auto-advance-wrap side-auto-wrap">
+                Auto
+                <label class="switch">
+                    <input type="checkbox" id="auto-toggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <button class="next-btn" id="next-btn" onclick="resolveTurn()">NEXT<br>TURN</button>
+            <button class="undo-btn" id="undo-btn" onclick="undoPlacement()" disabled>UNDO</button>
+        </div>
+        <div id="p1-hand" class="hand"></div>
+    </div>
+
+    <div id="log" class="log"></div>
+
+<script>
+    const suits = [{s:'♥', c:'red-suit'}, {s:'♦', c:'red-suit'}, {s:'♣', c:'black-suit'}, {s:'♠', c:'black-suit'}];
+    const ranks = [{r:'A', v:14}, {r:'2', v:2}, {r:'3', v:3}, {r:'4', v:4}, {r:'5', v:5}, {r:'6', v:6}, {r:'7', v:7}, {r:'8', v:8}, {r:'9', v:9}, {r:'10', v:10}, {r:'J', v:11}, {r:'Q', v:12}, {r:'K', v:13}];
+    
+    let p1Hp = 20, p2Hp = 20, p1Deck = [], p2Deck = [], p1Hand = [], p2Hand = [];
+    let board = Array(8).fill(null).map(() => Array(6).fill(null));
+    let tileTrail = Array(8).fill(null).map(() => Array(6).fill(null));
+    let selectedHandIndex = null, p1PlacedThisTurn = false, isAnim = false, lastPlacedCol = null;
+    let playerSide = 'blue';
+    let aiMode = 'normal';
+    let finalResolveMode = false;
+    let gameOverShown = false;
+    let lethalSnapshot = null;
+    let p1ColorName = 'BLUE', p2ColorName = 'RED';
+
+    function getTrailClass(owner) {
+        if (!owner) return '';
+        if (owner === 1) return playerSide === 'blue' ? 'trail-p1-blue' : 'trail-p1-red';
+        return playerSide === 'blue' ? 'trail-p2-red' : 'trail-p2-blue';
+    }
+
+    function markTrail(r, c, owner) {
+        if (r >= 0 && r < 8 && c >= 0 && c < 6) tileTrail[r][c] = owner;
+    }
+
+    function startGame(side) {
+        playerSide = side;
+        aiMode = document.querySelector('input[name="ai-mode"]:checked')?.value || 'normal';
+        board = Array(8).fill(null).map(() => Array(6).fill(null));
+        tileTrail = Array(8).fill(null).map(() => Array(6).fill(null));
+        p1Hand = [];
+        p2Hand = [];
+        p1Deck = [];
+        p2Deck = [];
+        const startHp = aiMode === 'cracked' ? 30 : 20;
+        p1Hp = startHp;
+        p2Hp = startHp;
+        finalResolveMode = false;
+        gameOverShown = false;
+        lethalSnapshot = null;
+        p1PlacedThisTurn = false;
+        selectedHandIndex = null;
+        lastPlacedCol = null;
+        isAnim = false;
+        document.getElementById('selection-screen').style.display = 'none';
+        
+        const p1L = document.getElementById('p1-label');
+        const p2L = document.getElementById('p2-label');
+
+        let fullDeck = [];
+        suits.forEach(s => ranks.forEach(r => fullDeck.push({ ...r, suit: s.s, color: s.c, maxHp: r.r === 'A' ? 1 : r.v, hp: r.r === 'A' ? 1 : r.v, uuid: self.crypto.randomUUID() })));
+        
+        const redCards = fullDeck.filter(c => c.color === 'red-suit').sort(() => Math.random() - 0.5);
+        const blackCards = fullDeck.filter(c => c.color === 'black-suit').sort(() => Math.random() - 0.5);
+
+        if (side === 'blue') {
+            p1Deck = blackCards;
+            p2Deck = redCards;
+            p1ColorName = 'BLUE';
+            p2ColorName = 'RED';
+            p1L.style.color = '#4dabf7';
+            p2L.style.color = '#ff6b6b';
+            drawCards();
+            logMsg("Blue moves first. Your turn.");
+        } else {
+            p1Deck = redCards;
+            p2Deck = blackCards;
+            p1ColorName = 'RED';
+            p2ColorName = 'BLUE';
+            p1L.style.color = '#ff6b6b';
+            p2L.style.color = '#4dabf7';
+            drawCards();
+            logMsg("Blue moves first. AI is staging a card...");
+            aiPlaceCard();
+        }
+
+        render();
+    }
+
+    function drawCards() {
+        while(p1Hand.length < 6 && p1Deck.length > 0) p1Hand.push(p1Deck.pop());
+        while(p2Hand.length < 6 && p2Deck.length > 0) p2Hand.push(p2Deck.pop());
+    }
+
+    function render() {
+        const p1DisplayHp = finalResolveMode ? Math.max(0, p1Hp) : p1Hp;
+        const p2DisplayHp = finalResolveMode ? Math.max(0, p2Hp) : p2Hp;
+        document.getElementById('p1-label').innerText = `YOU: ${p1DisplayHp} HP`;
+        document.getElementById('p2-label').innerText = `AI: ${p2DisplayHp} HP`;
+        document.getElementById('p1-big-label').innerText = `YOU ${p1ColorName}`;
+        document.getElementById('p2-big-label').innerText = `AI ${p2ColorName}`;
+        document.getElementById('p1-big-hp').innerText = p1DisplayHp;
+        document.getElementById('p2-big-hp').innerText = p2DisplayHp;
+        document.getElementById('p1-big-hp').style.color = p1ColorName === 'BLUE' ? '#4dabf7' : '#ff6b6b';
+        document.getElementById('p2-big-hp').style.color = p2ColorName === 'BLUE' ? '#4dabf7' : '#ff6b6b';
+        document.getElementById('undo-btn').disabled = !p1PlacedThisTurn || isAnim;
+
+        const hasBoardCards = board.some(row => row.some(cell => cell));
+        const manualCleanupNeeded = (p1Hand.length === 0 && hasBoardCards) || (finalResolveMode && hasBoardCards);
+        document.getElementById('next-btn').classList.toggle('needs-manual', manualCleanupNeeded);
+
+        const boardEl = document.getElementById('board');
+        const overlay = document.getElementById('game-over');
+        boardEl.innerHTML = '';
+        boardEl.appendChild(overlay);
+
+        for(let r=0; r<8; r++) {
+            for(let c=0; c<6; c++) {
+                const cell = document.createElement('div');
+                let zoneClass = "";
+                if (playerSide === 'blue') {
+                    if (r === 0) zoneClass = "zone-red";
+                    if (r === 7) zoneClass = "zone-blue";
+                } else {
+                    if (r === 0) zoneClass = "zone-blue";
+                    if (r === 7) zoneClass = "zone-red";
+                }
+                const trailClass = getTrailClass(tileTrail[r][c]);
+                cell.className = `cell ${zoneClass} ${trailClass}`;
+                cell.onclick = () => placeCard(r, c);
+                
+                if(board[r][c]) {
+                    const card = board[r][c];
+                    let borderClass = "";
+                    if (card.p === 1) {
+                        borderClass = playerSide === 'blue' ? 'border-blue' : 'border-red';
+                    } else {
+                        borderClass = playerSide === 'blue' ? 'border-ai-red' : 'border-ai-blue';
+                    }
+                    
+                    cell.innerHTML = `
+                        <div class="card ${card.color} ${borderClass} ${card.r === 'A' ? 'ace-card' : ''}" data-uuid="${card.uuid}">
+                            <div class="card-dir">${card.p === 1 ? '↑' : '↓'}</div>
+                            <div class="card-rank-suit">${card.r}${card.suit}</div>
+                            <div class="card-stock ${card.hp < card.maxHp && card.hp > 0 ? 'damaged' : ''}">${card.hp}</div>
+                        </div>`;
+                }
+                boardEl.appendChild(cell);
+            }
+        }
+
+        const handEl = document.getElementById('p1-hand');
+        handEl.innerHTML = '';
+        p1Hand.forEach((card, i) => {
+            const cEl = document.createElement('div');
+            cEl.className = `card ${card.color} ${selectedHandIndex === i ? 'selected' : ''} ${card.r === 'A' ? 'ace-card' : ''}`;
+            cEl.innerHTML = `
+                <div class="card-top">
+                    <div class="card-rank-suit">${card.r}${card.suit}</div>
+                </div>
+                <div class="card-stock ${card.hp < card.maxHp && card.hp > 0 ? 'damaged' : ''}">${card.hp}</div>`;
+            cEl.onclick = () => { if(!isAnim && !p1PlacedThisTurn) {selectedHandIndex = i; render();} };
+            handEl.appendChild(cEl);
+        });
+    }
+
+    function placeCard(r, c) {
+        if(isAnim || finalResolveMode || p1PlacedThisTurn || r !== 7 || selectedHandIndex === null || board[r][c]) return;
+        board[r][c] = { ...p1Hand.splice(selectedHandIndex, 1)[0], p: 1 };
+        markTrail(r, c, 1);
+        lastPlacedCol = c;
+        selectedHandIndex = null;
+        p1PlacedThisTurn = true;
+        
+        if (playerSide === 'blue') aiPlaceCard();
+        
+        render();
+
+        if(document.getElementById('auto-toggle').checked) {
+            setTimeout(resolveTurn, 400);
+        }
+    }
+
+    function undoPlacement() {
+        if (!p1PlacedThisTurn || isAnim || finalResolveMode) return;
+        p1Hand.push(board[7][lastPlacedCol]);
+        board[7][lastPlacedCol] = null;
+        
+        if(playerSide === 'blue') {
+            for (let c=0; c<6; c++) { 
+                if (board[0][c] && board[0][c].p === 2) { 
+                    p2Hand.push(board[0][c]); 
+                    board[0][c] = null; 
+                    break; 
+                } 
+            }
+        }
+        
+        p1PlacedThisTurn = false;
+        render();
+    }
+
+    function aiPlaceCardNormal() {
+        if(p2Hand.length === 0) return;
+        let laneScores = [0,0,0,0,0,0];
+        for(let c=0; c<6; c++) {
+            for(let r=0; r<8; r++) {
+                if(board[r][c] && board[r][c].p === 2) laneScores[c]++;
+            }
+            if(board[0][c]) laneScores[c] += 10;
+        }
+        let bestLane = laneScores.indexOf(Math.min(...laneScores));
+        p2Hand.sort((a,b) => b.v - a.v);
+        board[0][bestLane] = { ...p2Hand.shift(), p: 2 };
+        markTrail(0, bestLane, 2);
+    }
+
+    function aiPlaceCardCracked() {
+        if(p2Hand.length === 0) return;
+
+        const legalLanes = [];
+        for (let c = 0; c < 6; c++) {
+            if (!board[0][c]) legalLanes.push(c);
+        }
+        if (!legalLanes.length) return;
+
+        const postureRoll = Math.random();
+        const posture =
+            postureRoll < 0.28 ? 'aggressive' :
+            postureRoll < 0.52 ? 'defensive' :
+            postureRoll < 0.76 ? 'opportunistic' : 'swarmy';
+
+        const moves = [];
+        for (let i = 0; i < p2Hand.length; i++) {
+            const card = p2Hand[i];
+            for (const lane of legalLanes) {
+                let score = 0;
+
+                // Base card role value
+                if (card.r === 'A') score -= 5;
+                else if (card.v <= 6) score += 1;
+                else if (card.v <= 10) score += 3;
+                else score += 5;
+
+                // Read lane state
+                let aiCount = 0, enemyCount = 0, nearestEnemyRow = -1, nearestEnemyHp = 0, furthestAiRow = -1;
+                let enemyAceInLane = false;
+                let enemyAceStaged = false;
+                for (let r = 0; r < 8; r++) {
+                    const occ = board[r][lane];
+                    if (!occ) continue;
+                    if (occ.p === 2) {
+                        aiCount++;
+                        furthestAiRow = Math.max(furthestAiRow, r);
+                    } else {
+                        enemyCount++;
+                        nearestEnemyRow = Math.max(nearestEnemyRow, r);
+                        nearestEnemyHp = occ.hp;
+                        if (occ.r === 'A') {
+                            enemyAceInLane = true;
+                            if (r >= 6) enemyAceStaged = true;
+                        }
+                    }
+                }
+
+                // Threat response
+                if (nearestEnemyRow >= 5) score += 8;
+                else if (nearestEnemyRow >= 3) score += 4;
+
+                // Hotfix: don't keep feeding a lane where the player staged an Ace.
+                // An Ace in the player's backline is a bad lane to dump into unless this is our only lane.
+                if (enemyAceStaged) {
+                    score -= 18;
+                    if (aiCount > 0) score -= 8;
+                    if (card.v >= 10 || card.r === 'A') score -= 6;
+                } else if (enemyAceInLane) {
+                    score -= 6;
+                }
+
+                // Pressure/open lane
+                if (enemyCount === 0) score += 4;
+                if (furthestAiRow >= 2 && enemyCount === 0) score += 5;
+
+                // Reinforcement / occasional flooding
+                if (aiCount > 0) {
+                    score += 1.5;
+                    if (furthestAiRow >= 2) score += 3;
+                    if (posture === 'swarmy') score += 1.5;
+                    if (aiCount >= 2) score -= 7; // don't clog too hard
+                }
+
+                // Lane congestion penalty
+                if (aiCount + enemyCount >= 3) score -= 3;
+                if (aiCount >= 3) score -= 9;
+
+                // Card-to-job efficiency
+                if (enemyCount === 0 && card.v >= 12) score -= 2; // don't waste top end into emptiness too much
+                if (nearestEnemyHp > 0) {
+                    const diff = card.hp - nearestEnemyHp;
+                    if (diff >= 0 && diff <= 3) score += 4;
+                    if (diff < -3) score -= 3;
+                }
+
+                // Ace as tactical bullet
+                if (card.r === 'A') {
+                    if (nearestEnemyHp >= 10) score += 14;
+                    else if (nearestEnemyHp >= 7) score += 8;
+                    else if (enemyCount === 0) score -= 8;
+                    if (p2Hp < p1Hp) score += 2;
+                }
+
+                // Posture bends
+                if (posture === 'aggressive') {
+                    if (enemyCount === 0) score += 3;
+                    if (furthestAiRow >= 2) score += 2;
+                } else if (posture === 'defensive') {
+                    if (nearestEnemyRow >= 4) score += 4;
+                    if (enemyCount > 0) score += 2;
+                } else if (posture === 'opportunistic') {
+                    if (nearestEnemyHp >= 10) score += 4;
+                    if (card.r === 'A') score += 2;
+                }
+
+                // Small noise so it doesn't feel deterministic
+                score += Math.random() * 2.5;
+
+                moves.push({ handIndex: i, lane, score });
+            }
+        }
+
+        moves.sort((a, b) => b.score - a.score);
+        const top = moves.slice(0, Math.min(4, moves.length));
+        const weights = top.map((m, idx) => Math.max(1, [55, 25, 12, 8][idx] + (m.score - top[top.length - 1].score)));
+        let roll = Math.random() * weights.reduce((a, b) => a + b, 0);
+        let chosen = top[0];
+        for (let i = 0; i < top.length; i++) {
+            roll -= weights[i];
+            if (roll <= 0) {
+                chosen = top[i];
+                break;
+            }
+        }
+
+        const picked = p2Hand.splice(chosen.handIndex, 1)[0];
+        board[0][chosen.lane] = { ...picked, p: 2 };
+        markTrail(0, chosen.lane, 2);
+    }
+
+    function aiPlaceCard() {
+        if (aiMode === 'cracked') aiPlaceCardCracked();
+        else aiPlaceCardNormal();
+    }
+
+    async function resolveTurn() {
+        if(isAnim || gameOverShown) return;
+        isAnim = true;
+        document.getElementById('next-btn').disabled = true;
+
+        await processCombatAnims();
+        advanceBoardLogic();
+        p1PlacedThisTurn = false;
+
+        if (!finalResolveMode && (p1Hp <= 0 || p2Hp <= 0)) {
+            finalResolveMode = true;
+            lethalSnapshot = { p1: p1Hp, p2: p2Hp };
+            logMsg("Lethal reached. Final board resolve in progress...");
+        }
+
+        if (!finalResolveMode) {
+            drawCards();
+            if(playerSide === 'red') aiPlaceCard();
+        }
+
+        render();
+        isAnim = false;
+
+        const hasBoardCards = board.some(row => row.some(cell => cell));
+        const noCardsLeftAnywhere = !hasBoardCards && p1Hand.length === 0 && p2Hand.length === 0 && p1Deck.length === 0 && p2Deck.length === 0;
+
+        if (!finalResolveMode && noCardsLeftAnywhere && !lethalSnapshot) {
+            lethalSnapshot = { p1: p1Hp, p2: p2Hp };
+        }
+
+        if (finalResolveMode) {
+            if (hasBoardCards) {
+                setTimeout(() => {
+                    if (!isAnim && !gameOverShown) resolveTurn();
+                }, 450);
+                return;
+            }
+            checkGameOver();
+            return;
+        }
+
+        document.getElementById('next-btn').disabled = false;
+        checkGameOver();
+    }
+
+    async function processCombatAnims() {
+        let found = false;
+        for(let c=0; c<6; c++) {
+            let col = [];
+            for(let r=0; r<8; r++) if(board[r][c]) col.push({...board[r][c], r: r});
+            col.forEach(card => card.tr = card.p === 1 ? card.r - 1 : card.r + 1);
+            for(let i=0; i<col.length; i++) {
+                for(let j=i+1; j<col.length; j++) {
+                    let a = col[i], b = col[j];
+                    if(a.p !== b.p && ((a.tr === b.tr) || (a.r === b.tr && b.r === a.tr))) {
+                        found = true;
+                        let dA = document.querySelector(`[data-uuid="${a.uuid}"]`);
+                        let dB = document.querySelector(`[data-uuid="${b.uuid}"]`);
+                        if(dA) dA.style.background = '#00aa00';
+                        if(dB) dB.style.background = '#00aa00';
+                    }
+                }
+            }
+        }
+        if(found) await new Promise(r => setTimeout(r, 600));
+    }
+
+    function advanceBoardLogic() {
+        let next = Array(8).fill(null).map(() => Array(6).fill(null));
+
+        for(let c=0; c<6; c++) {
+            let col = [];
+            for(let r=0; r<8; r++) {
+                if(board[r][c]) {
+                    let card = { ...board[r][c] };
+                    card.cr = r;
+                    card.nr = card.p === 1 ? r - 1 : r + 1;
+                    col.push(card);
+                }
+            }
+
+            // Frontline-only combat: only the nearest opposing contact pair in a lane resolves.
+            for(let i=0; i<col.length - 1; i++) {
+                let a = col[i];
+                let b = col[i + 1];
+
+                if(a.p === b.p) continue;
+
+                const willContact =
+                    (a.nr === b.nr) ||
+                    (a.cr === b.nr && b.cr === a.nr);
+
+                if(!willContact) continue;
+
+                if (a.r === 'A' && b.r === 'A') {
+                    a.hp = 0;
+                    b.hp = 0;
+                } else if (a.r === 'A') {
+                    b.hp = 0;
+                } else if (b.r === 'A') {
+                    a.hp = 0;
+                } else {
+                    let clash = Math.min(a.hp, b.hp);
+                    a.hp -= clash;
+                    b.hp -= clash;
+                }
+
+                break;
+            }
+
+            col.forEach(card => {
+                if(card.hp <= 0) return;
+
+                if(card.p === 1 && card.nr === 0) {
+                    p2Hp -= card.hp;
+                }
+                else if(card.p === 2 && card.nr === 7) {
+                    p1Hp -= card.hp;
+                }
+                else if(card.nr >= 0 && card.nr <= 7) {
+                    if(!next[card.nr][c]) {
+                        next[card.nr][c] = { ...card };
+                        markTrail(card.nr, c, card.p);
+                    } else {
+                        next[card.cr][c] = { ...card };
+                        markTrail(card.cr, c, card.p);
+                    }
+                }
+            });
+        }
+
+        board = next;
+    }
+
+    function logMsg(m) {
+        const l = document.getElementById('log');
+        l.innerHTML += `<div>> ${m}</div>`;
+        l.scrollTop = l.scrollHeight;
+    }
+
+    function checkGameOver() {
+        if (gameOverShown) return;
+
+        const hasBoardCards = board.some(row => row.some(cell => cell));
+        const noCardsLeftAnywhere = !hasBoardCards && p1Hand.length === 0 && p2Hand.length === 0 && p1Deck.length === 0 && p2Deck.length === 0;
+
+        if (hasBoardCards) return;
+
+        if ((p1Hp <= 0 || p2Hp <= 0) || noCardsLeftAnywhere) {
+            gameOverShown = true;
+            const overlay = document.getElementById('game-over');
+            const winnerText = document.getElementById('winner-text');
+            const battleScoreEl = document.getElementById('battle-score-values');
+            const finalScoreEl = document.getElementById('final-score-values');
+
+            const winnerColor = p1Hp > p2Hp ? p1ColorName : p2ColorName;
+            winnerText.innerText = `${winnerColor} WINS!`;
+            winnerText.style.color = winnerColor === 'BLUE' ? '#4dabf7' : '#ff6b6b';
+
+            if (!lethalSnapshot) lethalSnapshot = { p1: p1Hp, p2: p2Hp };
+
+            const leftClass = p1ColorName === 'BLUE' ? 'score-left-blue' : 'score-left-red';
+            const rightClass = p2ColorName === 'BLUE' ? 'score-right-blue' : 'score-right-red';
+
+            battleScoreEl.innerHTML = `<span class="${leftClass}">${lethalSnapshot.p1}</span><span class="score-sep">•</span><span class="${rightClass}">${lethalSnapshot.p2}</span>`;
+            finalScoreEl.innerHTML = `<span class="${leftClass}">${p1Hp}</span><span class="score-sep">•</span><span class="${rightClass}">${p2Hp}</span>`;
+
+            overlay.style.display = 'flex';
+            document.getElementById('next-btn').disabled = true;
+        }
+    }
+</script>
+</body>
+</html>
