@@ -5,7 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Card Lane Battler - Fixed Opening Turn</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #1a1a1a; color: #fff; display: flex; flex-direction: column; align-items: center; padding: 20px; margin: 0; overflow-x: hidden; overflow-y: auto; }
+        :root {
+            --app-width: min(700px, calc(100vw - 24px));
+            --board-shell-width: min(760px, calc(100vw - 24px));
+            --board-width: min(600px, calc(100vw - 140px));
+            --board-height: 560px;
+            --board-gap: 8px;
+            --board-padding: 12px;
+            --cell-height: 58px;
+            --hand-height: 110px;
+            --hand-card-width: 60px;
+            --hand-card-height: 85px;
+        }
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #1a1a1a; color: #fff; display: flex; flex-direction: column; align-items: center; padding: 12px; margin: 0; overflow-x: hidden; overflow-y: auto; min-height: 100vh; }
         
         /* Selection Screen */
         #selection-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #111; z-index: 200; display: flex; flex-direction: column; justify-content: center; align-items: center; }
@@ -24,7 +37,7 @@
         .mode-option:hover { border-color: #666; }
 
         /* Header Layout */
-        .header { display: flex; justify-content: space-between; align-items: center; width: 700px; margin-bottom: 20px; padding: 15px 25px; background: #2d2d2d; border-radius: 8px; border: 1px solid #444; box-sizing: border-box;}
+        .header { display: flex; justify-content: space-between; align-items: center; width: var(--app-width); margin-bottom: 14px; padding: 12px 16px; background: #2d2d2d; border-radius: 8px; border: 1px solid #444;}
         .header-left, .header-right { display: flex; align-items: center; }
         .header-left { min-width: 150px; }
         .header-right { min-width: 220px; justify-content: flex-end; gap: 18px; }
@@ -36,14 +49,14 @@
         .side-auto-wrap { justify-content: space-between; background: #2d2d2d; border: 1px solid #444; border-radius: 8px; padding: 6px 10px; width: 100px; box-sizing: border-box; }
 
         /* Board */
-        .board-shell { position: relative; width: 760px; display: flex; justify-content: center; align-items: center; }
-        .board { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; background: #333; padding: 12px; border-radius: 8px; width: 600px; height: 560px; box-sizing: border-box; border: 2px solid #444; position: relative; overflow: hidden;}
-        .side-hp { position: absolute; top: 50%; transform: translateY(-50%); width: 70px; display: flex; flex-direction: column; align-items: center; gap: 6px; pointer-events: none; }
+        .board-shell { position: relative; width: var(--board-shell-width); display: flex; justify-content: center; align-items: center; gap: 10px; }
+        .board { display: grid; grid-template-columns: repeat(6, 1fr); gap: var(--board-gap); background: #333; padding: var(--board-padding); border-radius: 8px; width: var(--board-width); height: var(--board-height); border: 2px solid #444; position: relative; overflow: hidden;}
+        .side-hp { position: absolute; top: 50%; transform: translateY(-50%); width: 70px; display: flex; flex-direction: column; align-items: center; gap: 6px; pointer-events: none; z-index: 2; }
         .side-hp.left { left: 0; }
         .side-hp.right { right: 0; }
         .side-hp-label { font-size: 0.8rem; font-weight: bold; letter-spacing: 0.08em; color: #aaa; text-align: center; }
         .side-hp-value { font-size: 3.2rem; font-weight: 900; line-height: 1; text-align: center; }
-        .cell { background: #444; border-radius: 4px; display: flex; justify-content: center; align-items: center; position: relative; border: 1px solid #555; height: 58px; min-height: 58px;}
+        .cell { background: #444; border-radius: 4px; display: flex; justify-content: center; align-items: center; position: relative; border: 1px solid #555; height: var(--cell-height); min-height: var(--cell-height);}
         
         /* Zone Coloring */
         .zone-red { border: 2px solid #ff6b6b; background: #3a2525; }
@@ -70,7 +83,7 @@
         .border-ai-blue { border-top: 4px solid #4dabf7; }
         .border-ai-red { border-top: 4px solid #ff6b6b; }
 
-        .controls-area { display: flex; gap: 15px; margin-top: 20px; width: 700px; align-items: center; }
+        .controls-area { display: flex; gap: 12px; margin-top: 14px; width: var(--app-width); align-items: center; }
         .btn-group { display: flex; flex-direction: column; gap: 8px; align-items: stretch; width: 100px; }
         @keyframes nextTurnPulse {
             0%   { box-shadow: 0 0 0 0 rgba(255,255,255,0.00), 0 4px 0 #0b6e0b; }
@@ -81,12 +94,12 @@
         .next-btn.needs-manual { border-color: #ffffff; box-shadow: 0 0 0 4px rgba(255,255,255,0.22), 0 4px 0 #0b6e0b; animation: nextTurnPulse 1.2s ease-in-out infinite; }
         .undo-btn { width: 100px; height: 30px; font-size: 0.75rem; cursor: pointer; background: #444; border: 1px solid #666; border-radius: 8px; color: #fff; }
         
-        .hand { display: flex; gap: 8px; flex-grow: 1; background: #2d2d2d; padding: 10px; border-radius: 12px; height: 110px; align-items: center; justify-content: center; border: 1px solid #444; }
-        .hand .card { width: 60px; height: 86px; }
-        .hand .card { pointer-events: auto; width: 60px; height: 85px; cursor: pointer; }
+        .hand { display: flex; gap: 8px; flex-grow: 1; background: #2d2d2d; padding: 10px; border-radius: 12px; height: var(--hand-height); align-items: center; justify-content: center; border: 1px solid #444; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; }
+        .hand .card { width: var(--hand-card-width); height: calc(var(--hand-card-height) + 1px); flex: 0 0 auto; }
+        .hand .card { pointer-events: auto; width: var(--hand-card-width); height: var(--hand-card-height); cursor: pointer; }
         .hand .card.selected { border: 3px solid #00aa00; transform: translateY(-10px); box-shadow: 0 0 15px #00aa00; }
         
-        .log { margin-top: 15px; width: 700px; height: 70px; background: #000; border-radius: 8px; padding: 10px; overflow-y: auto; font-family: monospace; font-size: 0.75rem; color: #00ff41; border: 1px solid #333; box-sizing: border-box;}
+        .log { margin-top: 12px; width: var(--app-width); height: 70px; background: #000; border-radius: 8px; padding: 10px; overflow-y: auto; font-family: monospace; font-size: 0.75rem; color: #00ff41; border: 1px solid #333;}
         #game-over { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 100; flex-direction: column; justify-content: center; align-items: center; }
         .score-stack { display: flex; flex-direction: column; gap: 10px; align-items: center; margin: 10px 0 18px; }
         .score-line { display: flex; flex-direction: column; align-items: center; gap: 3px; }
@@ -99,6 +112,47 @@
         .score-sep { color: #e8e8e8; padding: 0 6px; }
         .new-game-btn { padding: 10px 20px; cursor: pointer; background: #00aa00; border: none; border-radius: 8px; color: #fff; font-weight: 800; box-shadow: 0 4px 0 #0b6e0b; }
         
+
+        @media (max-width: 820px) {
+            :root {
+                --app-width: calc(100vw - 16px);
+                --board-shell-width: calc(100vw - 16px);
+                --board-width: calc(100vw - 16px);
+                --board-height: min(72vh, calc((100vw - 16px) * 1.33));
+                --board-gap: 4px;
+                --board-padding: 6px;
+                --cell-height: calc((var(--board-height) - (var(--board-padding) * 2) - (var(--board-gap) * 7)) / 8);
+                --hand-height: 96px;
+                --hand-card-width: 50px;
+                --hand-card-height: 72px;
+            }
+            body { padding: 8px; }
+            .select-box { gap: 14px; width: calc(100vw - 24px); }
+            .side-btn { width: calc(50vw - 20px); max-width: 190px; height: 220px; }
+            .side-btn h2 { font-size: 1.4rem; }
+            .header { flex-wrap: wrap; gap: 8px; padding: 10px 12px; }
+            .header-left, .header-right, .turn-indicator { min-width: 0; }
+            .header-left, .header-right { flex: 1 1 45%; }
+            .turn-indicator { order: 3; width: 100%; font-size: 1rem; }
+            .board-shell { flex-direction: column; gap: 8px; }
+            .side-hp { position: static; transform: none; width: 100%; flex-direction: row; justify-content: center; gap: 10px; pointer-events: none; }
+            .side-hp.left { order: 1; }
+            .board { order: 2; }
+            .side-hp.right { order: 3; }
+            .side-hp-value { font-size: 2rem; }
+            .controls-area { position: sticky; bottom: 0; z-index: 30; background: linear-gradient(to top, rgba(26,26,26,0.98), rgba(26,26,26,0.94)); padding: 8px 0 calc(8px + env(safe-area-inset-bottom)); align-items: stretch; }
+            .btn-group { width: 88px; flex: 0 0 88px; }
+            .next-btn { width: 88px; height: 56px; font-size: 0.82rem; }
+            .undo-btn { width: 88px; }
+            .auto-advance-wrap { font-size: 0.7rem; }
+            .side-auto-wrap { width: 88px; padding: 6px 8px; }
+            .hand { justify-content: flex-start; padding: 8px; }
+            .board .card-dir { left: 4px; font-size: 0.82rem; }
+            .board .card-rank-suit { right: 4px; top: 3px; font-size: 0.7rem; }
+            .board .card-stock { bottom: 2px; font-size: 1.15rem; }
+            .log { height: 84px; font-size: 0.7rem; margin-bottom: 6px; }
+        }
+
         /* Toggle Switch */
         .switch { position: relative; display: inline-block; width: 34px; height: 18px; }
         .switch input { opacity: 0; width: 0; height: 0; }
@@ -199,6 +253,30 @@
     let lethalSnapshot = null;
     let p1ColorName = 'BLUE', p2ColorName = 'RED';
 
+    function playerStagingRow() {
+        return 7;
+    }
+
+    function aiStagingRow() {
+        return 0;
+    }
+
+    function hasPlayerStagedCard() {
+        const row = playerStagingRow();
+        return board[row].some(cell => cell && cell.p === 1);
+    }
+
+    function hasAiStagedCard() {
+        const row = aiStagingRow();
+        return board[row].some(cell => cell && cell.p === 2);
+    }
+
+    function readyToAdvanceTurn() {
+        if (finalResolveMode) return true;
+        if (!p1PlacedThisTurn) return false;
+        return hasPlayerStagedCard() && hasAiStagedCard();
+    }
+
     function getTrailClass(owner) {
         if (!owner) return '';
         if (owner === 1) return playerSide === 'blue' ? 'trail-p1-blue' : 'trail-p1-red';
@@ -283,7 +361,9 @@
 
         const hasBoardCards = board.some(row => row.some(cell => cell));
         const manualCleanupNeeded = (p1Hand.length === 0 && hasBoardCards) || (finalResolveMode && hasBoardCards);
-        document.getElementById('next-btn').classList.toggle('needs-manual', manualCleanupNeeded);
+        const nextBtn = document.getElementById('next-btn');
+        nextBtn.classList.toggle('needs-manual', manualCleanupNeeded);
+        nextBtn.disabled = isAnim || gameOverShown || !readyToAdvanceTurn();
 
         const boardEl = document.getElementById('board');
         const overlay = document.getElementById('game-over');
@@ -341,7 +421,7 @@
     }
 
     function placeCard(r, c) {
-        if(isAnim || finalResolveMode || p1PlacedThisTurn || r !== 7 || selectedHandIndex === null || board[r][c]) return;
+        if(isAnim || finalResolveMode || p1PlacedThisTurn || r !== playerStagingRow() || selectedHandIndex === null || board[r][c]) return;
         board[r][c] = { ...p1Hand.splice(selectedHandIndex, 1)[0], p: 1 };
         markTrail(r, c, 1);
         lastPlacedCol = c;
@@ -352,15 +432,16 @@
         
         render();
 
-        if(document.getElementById('auto-toggle').checked) {
+        if(document.getElementById('auto-toggle').checked && readyToAdvanceTurn()) {
             setTimeout(resolveTurn, 400);
         }
     }
 
     function undoPlacement() {
         if (!p1PlacedThisTurn || isAnim || finalResolveMode) return;
-        p1Hand.push(board[7][lastPlacedCol]);
-        board[7][lastPlacedCol] = null;
+        const row = playerStagingRow();
+        p1Hand.push(board[row][lastPlacedCol]);
+        board[row][lastPlacedCol] = null;
         
         if(playerSide === 'blue') {
             for (let c=0; c<6; c++) { 
@@ -529,6 +610,10 @@
 
     async function resolveTurn() {
         if(isAnim || gameOverShown) return;
+        if (!readyToAdvanceTurn()) {
+            if (!finalResolveMode) logMsg('Place a card in your staging row before ending the turn.');
+            return;
+        }
         isAnim = true;
         document.getElementById('next-btn').disabled = true;
 
@@ -666,6 +751,10 @@
         l.innerHTML += `<div>> ${m}</div>`;
         l.scrollTop = l.scrollHeight;
     }
+
+    window.addEventListener('resize', () => {
+        if (!document.getElementById('selection-screen') || document.getElementById('selection-screen').style.display === 'none') render();
+    });
 
     function checkGameOver() {
         if (gameOverShown) return;
