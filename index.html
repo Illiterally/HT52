@@ -115,42 +115,88 @@
 
         @media (max-width: 820px) {
             :root {
-                --app-width: calc(100vw - 16px);
-                --board-shell-width: calc(100vw - 16px);
-                --board-width: calc(100vw - 16px);
-                --board-height: min(72vh, calc((100vw - 16px) * 1.33));
+                --app-width: calc(100vw - 12px);
+                --board-shell-width: calc(100vw - 12px);
+                --board-width: calc(100vw - 12px);
+                --board-height: min(56dvh, calc((100vw - 12px) * 1.10));
                 --board-gap: 4px;
                 --board-padding: 6px;
                 --cell-height: calc((var(--board-height) - (var(--board-padding) * 2) - (var(--board-gap) * 7)) / 8);
-                --hand-height: 96px;
-                --hand-card-width: 50px;
-                --hand-card-height: 72px;
+                --hand-height: 82px;
+                --hand-card-width: 44px;
+                --hand-card-height: 62px;
             }
-            body { padding: 8px; }
+            body { padding: 6px; }
             .select-box { gap: 14px; width: calc(100vw - 24px); }
             .side-btn { width: calc(50vw - 20px); max-width: 190px; height: 220px; }
             .side-btn h2 { font-size: 1.4rem; }
-            .header { flex-wrap: wrap; gap: 8px; padding: 10px 12px; }
+
+            .header {
+                gap: 6px;
+                padding: 6px 10px;
+                margin-bottom: 8px;
+                min-height: 0;
+            }
             .header-left, .header-right, .turn-indicator { min-width: 0; }
-            .header-left, .header-right { flex: 1 1 45%; }
-            .turn-indicator { order: 3; width: 100%; font-size: 1rem; }
-            .board-shell { flex-direction: column; gap: 8px; }
-            .side-hp { position: static; transform: none; width: 100%; flex-direction: row; justify-content: center; gap: 10px; pointer-events: none; }
-            .side-hp.left { order: 1; }
-            .board { order: 2; }
-            .side-hp.right { order: 3; }
-            .side-hp-value { font-size: 2rem; }
-            .controls-area { position: sticky; bottom: 0; z-index: 30; background: linear-gradient(to top, rgba(26,26,26,0.98), rgba(26,26,26,0.94)); padding: 8px 0 calc(8px + env(safe-area-inset-bottom)); align-items: stretch; }
-            .btn-group { width: 88px; flex: 0 0 88px; }
-            .next-btn { width: 88px; height: 56px; font-size: 0.82rem; }
-            .undo-btn { width: 88px; }
-            .auto-advance-wrap { font-size: 0.7rem; }
-            .side-auto-wrap { width: 88px; padding: 6px 8px; }
-            .hand { justify-content: flex-start; padding: 8px; }
-            .board .card-dir { left: 4px; font-size: 0.82rem; }
-            .board .card-rank-suit { right: 4px; top: 3px; font-size: 0.7rem; }
-            .board .card-stock { bottom: 2px; font-size: 1.15rem; }
-            .log { height: 84px; font-size: 0.7rem; margin-bottom: 6px; }
+            .header-left, .header-right { flex: 0 0 auto; }
+            .p2-stats, .p1-stats { min-width: 0; font-size: 0.95rem; }
+            .p1-stats { text-align: right; }
+            .turn-indicator { flex: 1 1 auto; font-size: 0.95rem; }
+
+            .board-shell { flex-direction: column; gap: 0; }
+            .side-hp { display: none; }
+            .board { order: 1; }
+
+            .controls-area {
+                position: sticky;
+                bottom: 0;
+                z-index: 30;
+                gap: 8px;
+                margin-top: 8px;
+                background: linear-gradient(to top, rgba(26,26,26,0.99), rgba(26,26,26,0.95));
+                padding: 6px 0 calc(6px + env(safe-area-inset-bottom));
+                align-items: stretch;
+            }
+            .btn-group { width: 72px; flex: 0 0 72px; gap: 6px; }
+            .next-btn { width: 72px; height: 48px; font-size: 0.74rem; line-height: 1.05; }
+            .undo-btn { width: 72px; height: 26px; font-size: 0.68rem; }
+            .auto-advance-wrap { font-size: 0.65rem; }
+            .side-auto-wrap { width: 72px; padding: 5px 6px; }
+            .hand {
+                justify-content: flex-start;
+                gap: 4px;
+                padding: 6px;
+                height: var(--hand-height);
+                overflow-x: hidden;
+            }
+            .hand .card {
+                width: calc((100vw - 12px - 72px - 8px - 12px - 20px) / 6);
+                min-width: 40px;
+                max-width: 46px;
+                height: var(--hand-card-height);
+            }
+            .board .card-dir { left: 3px; font-size: 0.72rem; }
+            .board .card-rank-suit { right: 3px; top: 2px; font-size: 0.62rem; }
+            .board .card-stock { bottom: 1px; font-size: 1rem; }
+            .log { display: none; }
+        }
+
+        @media (max-width: 430px) {
+            :root {
+                --board-height: min(54dvh, calc((100vw - 12px) * 1.06));
+                --hand-height: 78px;
+                --hand-card-height: 58px;
+            }
+            .header { padding: 5px 8px; }
+            .p2-stats, .p1-stats, .turn-indicator { font-size: 0.88rem; }
+            .btn-group { width: 68px; flex-basis: 68px; }
+            .next-btn { width: 68px; height: 44px; font-size: 0.7rem; }
+            .undo-btn, .side-auto-wrap { width: 68px; }
+            .hand .card {
+                width: calc((100vw - 12px - 68px - 8px - 12px - 20px) / 6);
+                min-width: 38px;
+                max-width: 43px;
+            }
         }
 
         /* Toggle Switch */
