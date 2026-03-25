@@ -23,10 +23,13 @@
         /* Selection Screen */
         #selection-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #111; z-index: 200; display: flex; flex-direction: column; justify-content: center; align-items: center; }
         .select-box { display: flex; gap: 40px; margin-top: 30px; }
-        .side-btn { width: 220px; height: 280px; border-radius: 15px; cursor: pointer; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 4px solid transparent; transition: 0.3s; background: #222; }
+        .side-btn { width: 220px; height: 280px; border-radius: 15px; cursor: pointer; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 4px solid transparent; transition: 0.3s; background: #222; position: relative; z-index: 2; }
         .side-btn:hover { transform: scale(1.05); }
         .side-btn.blue { border-color: #4dabf7; color: #4dabf7; }
         .side-btn.red { border-color: #ff6b6b; color: #ff6b6b; }
+        .side-btn.disabled { opacity: 0.35; filter: grayscale(0.35); cursor: not-allowed; pointer-events: none; }
+        #game-over.winner-blue { border: 4px solid #4dabf7; box-shadow: inset 0 0 0 2px rgba(77,171,247,0.25); }
+        #game-over.winner-red { border: 4px solid #ff6b6b; box-shadow: inset 0 0 0 2px rgba(255,107,107,0.25); }
         .side-btn h2 { margin: 10px 0; font-size: 2rem; }
         .side-btn p { font-size: 0.85rem; color: #aaa; text-align: center; }
         .mode-select-wrap { margin-top: 18px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
@@ -35,6 +38,19 @@
         .mode-option { display: flex; align-items: center; gap: 8px; background: #222; border: 1px solid #444; border-radius: 999px; padding: 8px 14px; color: #ddd; cursor: pointer; user-select: none; }
         .mode-option input { accent-color: #00aa00; }
         .mode-option:hover { border-color: #666; }
+
+        .pick-options { margin-top: 48px; display: flex; flex-direction: column; align-items: center; gap: 18px; }
+        .pick-option-group { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+        .pick-option-label { font-size: 0.9rem; letter-spacing: 0.08em; color: #fff; text-transform: none; }
+        .pick-option-row { display: flex; gap: 12px; flex-wrap: nowrap; justify-content: center; align-items: center; }
+        .inactive-lane { opacity: 0.28; filter: grayscale(0.35); }
+        .inactive-lane::after { content: ""; position: absolute; inset: 0; background: rgba(0,0,0,0.18); border-radius: 4px; pointer-events: none; }
+        #pass-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.82); z-index: 500; align-items: center; justify-content: center; }
+        .pass-panel { background: #1b1b1b; border: 1px solid #3a3a3a; border-radius: 18px; padding: 28px 24px; min-width: 280px; text-align: center; box-shadow: 0 12px 32px rgba(0,0,0,0.35); }
+        .pass-title { font-size: 1.4rem; font-weight: 700; margin-bottom: 10px; }
+        .pass-copy { color: #cfcfcf; margin-bottom: 16px; }
+        .pass-btn { background: #2b2b2b; color: #fff; border: 1px solid #555; border-radius: 999px; padding: 10px 20px; cursor: pointer; font-size: 1rem; }
+        .pass-btn:hover { border-color: #888; }
 
         /* Header Layout */
         .header { display: flex; justify-content: space-between; align-items: center; width: var(--app-width); margin-bottom: 14px; padding: 12px 16px; background: #2d2d2d; border-radius: 8px; border: 1px solid #444;}
@@ -50,6 +66,48 @@
 
         /* Board */
         .board-shell { position: relative; width: var(--board-shell-width); display: flex; justify-content: center; align-items: center; gap: 10px; }
+        .board-center-wrap { position: relative; display: flex; flex-direction: column; align-items: center; gap: 6px; width: var(--board-width); }
+        .suit-legend {
+            position: relative;
+            top: auto;
+            left: auto;
+            transform: none;
+            width: calc(100% - 8px);
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0;
+            padding: 4px 10px 5px;
+            border-radius: 10px;
+            background: #444;
+            border: 1px solid #555;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.18);
+            z-index: 5;
+            pointer-events: none;
+            white-space: nowrap;
+            box-sizing: border-box;
+            flex: 0 0 auto;
+        }
+        .suit-legend.show { display: inline-flex; }
+        .suit-legend .suit {
+            font-size: 2rem;
+            font-weight: 700;
+            line-height: 1;
+            min-width: 24px;
+            text-align: center;
+        }
+        .suit-legend .suit.redish { color: #d63b3b; }
+        .suit-legend .suit.blackish { color: #111; }
+        .suit-legend .arrow {
+            width: 0;
+            height: 0;
+            border-top: 5px solid transparent;
+            border-bottom: 5px solid transparent;
+            border-left: 7px solid #19cc19;
+            opacity: 0.95;
+            transform: translateY(1px);
+            filter: drop-shadow(0 0 1px rgba(25,204,25,0.12));
+        }
         .board { display: grid; grid-template-columns: repeat(6, 1fr); gap: var(--board-gap); background: #333; padding: var(--board-padding); border-radius: 8px; width: var(--board-width); height: var(--board-height); border: 2px solid #444; position: relative; overflow: hidden;}
         .side-hp { position: absolute; top: 50%; transform: translateY(-50%); width: 70px; display: flex; flex-direction: column; align-items: center; gap: 6px; pointer-events: none; z-index: 2; }
         .side-hp.left { left: 0; }
@@ -146,6 +204,10 @@
             .board-shell { flex-direction: column; gap: 0; }
             .side-hp { display: none; }
             .board { order: 1; }
+            .board-center-wrap { width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 5px; }
+            .suit-legend { width: calc(100% - 6px); padding: 4px 8px 5px; }
+            .suit-legend .suit { font-size: 1.45rem; }
+            .suit-legend .arrow { border-top-width: 4px; border-bottom-width: 4px; border-left-width: 7px; }
 
             .controls-area {
                 position: sticky;
@@ -226,14 +288,66 @@
             </div>
         </div>
         <div class="select-box">
-            <div class="side-btn blue" onclick="startGame('blue')">
+            <div class="side-btn blue" id="blue-side-btn" onclick="startGame('blue')">
                 <h2>BLUE</h2>
                 <p>Moves First<br>Cards: Black</p>
             </div>
-            <div class="side-btn red" onclick="startGame('red')">
+            <div class="side-btn red" id="red-side-btn" onclick="startGame('red')">
                 <h2>RED</h2>
                 <p>Moves Second<br>Cards: Red</p>
             </div>
+        </div>
+
+        <div class="pick-options">
+            <div class="pick-option-group">
+                <div class="pick-option-label">Suit Functions</div>
+                <div class="pick-option-row">
+                    <label class="mode-option">
+                        <input type="radio" name="suit-mode" value="off" checked>
+                        <span>Off</span>
+                    </label>
+                    <label class="mode-option">
+                        <input type="radio" name="suit-mode" value="on">
+                        <span>On</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="pick-option-group">
+                <div class="pick-option-label">Lanes</div>
+                <div class="pick-option-row">
+                    <label class="mode-option">
+                        <input type="radio" name="lane-mode" value="normal" checked>
+                        <span>Normal</span>
+                    </label>
+                    <label class="mode-option">
+                        <input type="radio" name="lane-mode" value="narrows">
+                        <span>Narrows</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="pick-option-group">
+                <div class="pick-option-label">Hotseat</div>
+                <div class="pick-option-row">
+                    <label class="mode-option">
+                        <input type="radio" name="game-mode" value="ai" checked>
+                        <span>Off</span>
+                    </label>
+                    <label class="mode-option">
+                        <input type="radio" name="game-mode" value="hotseat">
+                        <span>On</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="pass-overlay">
+        <div class="pass-panel">
+            <div class="pass-title" id="pass-title">Pass to Player</div>
+            <div class="pass-copy" id="pass-copy">Keep the hand hidden, then continue.</div>
+            <button class="pass-btn" onclick="confirmHotseatPass()">Ready</button>
         </div>
     </div>
 
@@ -253,11 +367,24 @@
             <div class="side-hp-value" id="p2-big-hp">20</div>
         </div>
 
-        <div class="board" id="board">
-            <div id="game-over">
-                <h1 id="winner-text">Winner!</h1>
-                <div id="score-text" class="score-stack"><div class="score-line"><span class="score-label">Battle Score</span><span id="battle-score-values" class="score-values">0 • 0</span></div><div class="score-line"><span class="score-label">Final Score</span><span id="final-score-values" class="score-values">0 • 0</span></div></div>
-                <button class="new-game-btn" onclick="location.reload()">New Game</button>
+        <div class="board-center-wrap">
+            <div id="suit-legend" class="suit-legend" aria-hidden="true">
+                <span class="suit blackish">♣</span>
+                <span class="arrow"></span>
+                <span class="suit redish">♦</span>
+                <span class="arrow"></span>
+                <span class="suit blackish">♠</span>
+                <span class="arrow"></span>
+                <span class="suit redish">♥</span>
+                <span class="arrow"></span>
+                <span class="suit blackish">♣</span>
+            </div>
+            <div class="board" id="board">
+                <div id="game-over">
+                    <h1 id="winner-text">Winner!</h1>
+                    <div id="score-text" class="score-stack"><div class="score-line"><span class="score-label">Battle Score</span><span id="battle-score-values" class="score-values">0 • 0</span></div><div class="score-line"><span class="score-label">Final Score</span><span id="final-score-values" class="score-values">0 • 0</span></div></div>
+                    <button class="new-game-btn" onclick="location.reload()">New Game</button>
+                </div>
             </div>
         </div>
 
@@ -285,6 +412,27 @@
     <div id="log" class="log"></div>
 
 <script>
+
+function suitSurpasses(suitA, suitB) {
+  const norm = (s) => {
+    if (s === '♣' || s === 'Clubs') return 'Clubs';
+    if (s === '♦' || s === 'Diamonds') return 'Diamonds';
+    if (s === '♠' || s === 'Spades') return 'Spades';
+    if (s === '♥' || s === 'Hearts') return 'Hearts';
+    return s;
+  };
+
+  suitA = norm(suitA);
+  suitB = norm(suitB);
+
+  return (
+    (suitA === "Clubs" && suitB === "Diamonds") ||
+    (suitA === "Diamonds" && suitB === "Spades") ||
+    (suitA === "Spades" && suitB === "Hearts") ||
+    (suitA === "Hearts" && suitB === "Clubs")
+  );
+}
+
     const suits = [{s:'♥', c:'red-suit'}, {s:'♦', c:'red-suit'}, {s:'♣', c:'black-suit'}, {s:'♠', c:'black-suit'}];
     const ranks = [{r:'A', v:14}, {r:'2', v:2}, {r:'3', v:3}, {r:'4', v:4}, {r:'5', v:5}, {r:'6', v:6}, {r:'7', v:7}, {r:'8', v:8}, {r:'9', v:9}, {r:'10', v:10}, {r:'J', v:11}, {r:'Q', v:12}, {r:'K', v:13}];
     
@@ -294,10 +442,70 @@
     let selectedHandIndex = null, p1PlacedThisTurn = false, isAnim = false, lastPlacedCol = null;
     let playerSide = 'blue';
     let aiMode = 'normal';
+    let gameMode = 'ai';
+    let laneMode = 'normal';
+    let laneCount = 6;
+    let suitFunctionsEnabled = false;
     let finalResolveMode = false;
     let gameOverShown = false;
     let lethalSnapshot = null;
     let p1ColorName = 'BLUE', p2ColorName = 'RED';
+    let hotseatStage = 'p1'; // p1, pass, p2, resolve
+    let p2PlacedThisTurn = false;
+    let p2LastPlacedCol = null;
+
+    function getActiveLanes() {
+        return laneMode === 'narrows' ? [1, 2, 3] : [0, 1, 2, 3, 4, 5];
+    }
+
+    function isLaneActive(c) {
+        return getActiveLanes().includes(c);
+    }
+
+    function currentHand() {
+        if (gameMode !== 'hotseat') return p1Hand;
+        if (hotseatStage === 'p1') return p1Hand;
+        if (hotseatStage === 'p2') return p2Hand;
+        return [];
+    }
+
+    function currentStageRow() {
+        if (gameMode !== 'hotseat') return playerStagingRow();
+        return hotseatStage === 'p2' ? aiStagingRow() : playerStagingRow();
+    }
+
+    function currentStageOwner() {
+        if (gameMode !== 'hotseat') return 1;
+        return hotseatStage === 'p2' ? 2 : 1;
+    }
+
+    function boardIsFlipped() {
+        return gameMode === 'hotseat' && (hotseatStage === 'p2' || hotseatStage === 'pass');
+    }
+
+    function viewRowToBoardRow(viewRow) {
+        return boardIsFlipped() ? 7 - viewRow : viewRow;
+    }
+
+    function boardRowToViewRow(boardRow) {
+        return boardIsFlipped() ? 7 - boardRow : boardRow;
+    }
+
+    function confirmHotseatPass() {
+        hotseatStage = 'p2';
+        selectedHandIndex = null;
+        render();
+    }
+
+    function hotseatEnabledFromMenu() {
+        return (document.querySelector('input[name="game-mode"]:checked')?.value || 'ai') === 'hotseat';
+    }
+
+    function updateSideButtonState() {
+        const redBtn = document.getElementById('red-side-btn');
+        if (!redBtn) return;
+        redBtn.classList.toggle('disabled', hotseatEnabledFromMenu());
+    }
 
     function playerStagingRow() {
         return 7;
@@ -331,6 +539,10 @@
         const playerReady = hasPlayerStagedCard() || !playerCanStageCard();
         const aiReady = hasAiStagedCard() || !aiCanStageCard();
 
+        if (gameMode === 'hotseat') {
+            return hotseatStage === 'resolve' && playerReady && aiReady;
+        }
+
         if (playerCanStageCard() && !p1PlacedThisTurn) return false;
         return playerReady && aiReady;
     }
@@ -346,32 +558,49 @@
     }
 
     function startGame(side) {
+        if (hotseatEnabledFromMenu() && side === 'red') return;
         playerSide = side;
         aiMode = document.querySelector('input[name="ai-mode"]:checked')?.value || 'normal';
+        gameMode = document.querySelector('input[name="game-mode"]:checked')?.value || 'ai';
+        laneMode = document.querySelector('input[name="lane-mode"]:checked')?.value || 'normal';
+        laneCount = laneMode === 'narrows' ? 3 : 6;
+        suitFunctionsEnabled = (document.querySelector('input[name="suit-mode"]:checked')?.value || 'off') === 'on';
+
         board = Array(8).fill(null).map(() => Array(6).fill(null));
         tileTrail = Array(8).fill(null).map(() => Array(6).fill(null));
         p1Hand = [];
         p2Hand = [];
         p1Deck = [];
         p2Deck = [];
-        const startHp = aiMode === 'cracked' ? 30 : 20;
+        const startHp = (aiMode === 'cracked' && gameMode === 'ai') ? 30 : 20;
         p1Hp = startHp;
         p2Hp = startHp;
         finalResolveMode = false;
         gameOverShown = false;
         lethalSnapshot = null;
         p1PlacedThisTurn = false;
+        p2PlacedThisTurn = false;
+        hotseatStage = 'p1';
         selectedHandIndex = null;
         lastPlacedCol = null;
+        p2LastPlacedCol = null;
         isAnim = false;
+
         document.getElementById('selection-screen').style.display = 'none';
-        
+
         const p1L = document.getElementById('p1-label');
         const p2L = document.getElementById('p2-label');
 
         let fullDeck = [];
-        suits.forEach(s => ranks.forEach(r => fullDeck.push({ ...r, suit: s.s, color: s.c, maxHp: r.r === 'A' ? 1 : r.v, hp: r.r === 'A' ? 1 : r.v, uuid: self.crypto.randomUUID() })));
-        
+        suits.forEach(s => ranks.forEach(r => fullDeck.push({
+            ...r,
+            suit: s.s,
+            color: s.c,
+            maxHp: r.r === 'A' ? 1 : r.v,
+            hp: r.r === 'A' ? 1 : r.v,
+            uuid: self.crypto.randomUUID()
+        })));
+
         const redCards = fullDeck.filter(c => c.color === 'red-suit').sort(() => Math.random() - 0.5);
         const blackCards = fullDeck.filter(c => c.color === 'black-suit').sort(() => Math.random() - 0.5);
 
@@ -382,8 +611,6 @@
             p2ColorName = 'RED';
             p1L.style.color = '#4dabf7';
             p2L.style.color = '#ff6b6b';
-            drawCards();
-            logMsg("Blue moves first. Your turn.");
         } else {
             p1Deck = redCards;
             p2Deck = blackCards;
@@ -391,7 +618,16 @@
             p2ColorName = 'BLUE';
             p1L.style.color = '#ff6b6b';
             p2L.style.color = '#4dabf7';
-            drawCards();
+        }
+
+        drawCards();
+
+        if (gameMode === 'hotseat') {
+            hotseatStage = side === 'blue' ? 'p1' : 'p2';
+            logMsg(`Hotseat: ${hotseatStage === 'p1' ? 'P1' : 'P2'} stages first.`);
+        } else if (side === 'blue') {
+            logMsg("Blue moves first. Your turn.");
+        } else {
             logMsg("Blue moves first. AI is staging a card...");
             aiPlaceCard();
         }
@@ -407,54 +643,90 @@
     function render() {
         const p1DisplayHp = finalResolveMode ? Math.max(0, p1Hp) : p1Hp;
         const p2DisplayHp = finalResolveMode ? Math.max(0, p2Hp) : p2Hp;
-        document.getElementById('p1-label').innerText = `YOU: ${p1DisplayHp} HP`;
-        document.getElementById('p2-label').innerText = `AI: ${p2DisplayHp} HP`;
-        document.getElementById('p1-big-label').innerText = `YOU ${p1ColorName}`;
-        document.getElementById('p2-big-label').innerText = `AI ${p2ColorName}`;
+        const p1Name = gameMode === 'hotseat' ? 'P1' : 'YOU';
+        const p2Name = gameMode === 'hotseat' ? 'P2' : 'AI';
+        document.getElementById('p1-label').innerText = `${p1Name}: ${p1DisplayHp} HP`;
+        document.getElementById('p2-label').innerText = `${p2Name}: ${p2DisplayHp} HP`;
+        document.getElementById('p1-big-label').innerText = `${p1Name} ${p1ColorName}`;
+        document.getElementById('p2-big-label').innerText = `${p2Name} ${p2ColorName}`;
         document.getElementById('p1-big-hp').innerText = p1DisplayHp;
         document.getElementById('p2-big-hp').innerText = p2DisplayHp;
         document.getElementById('p1-big-hp').style.color = p1ColorName === 'BLUE' ? '#4dabf7' : '#ff6b6b';
         document.getElementById('p2-big-hp').style.color = p2ColorName === 'BLUE' ? '#4dabf7' : '#ff6b6b';
-        document.getElementById('undo-btn').disabled = !p1PlacedThisTurn || isAnim;
+        document.getElementById('undo-btn').disabled = gameMode === 'hotseat' || !p1PlacedThisTurn || isAnim;
 
         const hasBoardCards = board.some(row => row.some(cell => cell));
-        const manualCleanupNeeded = (p1Hand.length === 0 && hasBoardCards) || (finalResolveMode && hasBoardCards);
+        const manualCleanupNeeded = ((gameMode === 'hotseat' ? (p1Hand.length === 0 && p2Hand.length === 0) : p1Hand.length === 0) && hasBoardCards) || (finalResolveMode && hasBoardCards);
         const nextBtn = document.getElementById('next-btn');
         nextBtn.classList.toggle('needs-manual', manualCleanupNeeded);
         nextBtn.disabled = isAnim || gameOverShown || !readyToAdvanceTurn();
 
+        const turnEl = document.getElementById('turn-display');
+        if (gameMode === 'hotseat') {
+            if (hotseatStage === 'pass') turnEl.innerText = 'Pass Device';
+            else if (hotseatStage === 'resolve') turnEl.innerText = 'Ready to Resolve';
+            else turnEl.innerText = hotseatStage === 'p1' ? 'P1 Stage' : 'P2 Stage';
+        } else {
+            turnEl.innerText = readyToAdvanceTurn() ? 'Ready to Resolve' : 'Your Turn';
+        }
+
+        const suitLegend = document.getElementById('suit-legend');
+        if (suitLegend) suitLegend.classList.toggle('show', !!suitFunctionsEnabled);
+
+        const passOverlay = document.getElementById('pass-overlay');
+        passOverlay.style.display = (gameMode === 'hotseat' && hotseatStage === 'pass') ? 'flex' : 'none';
+        document.getElementById('pass-title').innerText = playerSide === 'blue' ? 'Pass to P2' : 'Pass to P1';
+        document.getElementById('pass-copy').innerText = playerSide === 'blue' ? 'Keep the hand hidden, then let Player 2 stage a card.' : 'Keep the hand hidden, then let Player 1 stage a card.';
+
         const boardEl = document.getElementById('board');
         const overlay = document.getElementById('game-over');
+        const activeLanes = getActiveLanes();
         boardEl.innerHTML = '';
         boardEl.appendChild(overlay);
+        boardEl.style.gridTemplateColumns = `repeat(${activeLanes.length}, 1fr)`;
+        boardEl.style.width = laneMode === 'narrows' ? 'min(320px, calc(100vw - 140px))' : 'var(--board-width)';
+        const boardWrap = document.querySelector('.board-center-wrap');
+        if (boardWrap) boardWrap.style.width = boardEl.style.width;
 
-        for(let r=0; r<8; r++) {
-            for(let c=0; c<6; c++) {
+        for (let vr = 0; vr < 8; vr++) {
+            for (const c of activeLanes) {
+                const r = viewRowToBoardRow(vr);
                 const cell = document.createElement('div');
                 let zoneClass = "";
-                if (playerSide === 'blue') {
-                    if (r === 0) zoneClass = "zone-red";
-                    if (r === 7) zoneClass = "zone-blue";
+                if (!boardIsFlipped()) {
+                    if (playerSide === 'blue') {
+                        if (r === 0) zoneClass = "zone-red";
+                        if (r === 7) zoneClass = "zone-blue";
+                    } else {
+                        if (r === 0) zoneClass = "zone-blue";
+                        if (r === 7) zoneClass = "zone-red";
+                    }
                 } else {
-                    if (r === 0) zoneClass = "zone-blue";
-                    if (r === 7) zoneClass = "zone-red";
+                    if (playerSide === 'blue') {
+                        if (vr === 0) zoneClass = "zone-blue";
+                        if (vr === 7) zoneClass = "zone-red";
+                    } else {
+                        if (vr === 0) zoneClass = "zone-red";
+                        if (vr === 7) zoneClass = "zone-blue";
+                    }
                 }
                 const trailClass = getTrailClass(tileTrail[r][c]);
                 cell.className = `cell ${zoneClass} ${trailClass}`;
                 cell.onclick = () => placeCard(r, c);
-                
-                if(board[r][c]) {
+
+                if (board[r][c]) {
                     const card = board[r][c];
                     let borderClass = "";
-                    if (card.p === 1) {
-                        borderClass = playerSide === 'blue' ? 'border-blue' : 'border-red';
-                    } else {
-                        borderClass = playerSide === 'blue' ? 'border-ai-red' : 'border-ai-blue';
-                    }
-                    
+                    if (card.p === 1) borderClass = playerSide === 'blue' ? 'border-blue' : 'border-red';
+                    else borderClass = playerSide === 'blue' ? 'border-ai-red' : 'border-ai-blue';
+
+                    const dir = boardIsFlipped()
+                        ? (card.p === 1 ? '↓' : '↑')
+                        : (card.p === 1 ? '↑' : '↓');
+
                     cell.innerHTML = `
                         <div class="card ${card.color} ${borderClass} ${card.r === 'A' ? 'ace-card' : ''}" data-uuid="${card.uuid}">
-                            <div class="card-dir">${card.p === 1 ? '↑' : '↓'}</div>
+                            <div class="card-dir">${dir}</div>
                             <div class="card-rank-suit">${card.r}${card.suit}</div>
                             <div class="card-stock ${card.hp < card.maxHp && card.hp > 0 ? 'damaged' : ''}">${card.hp}</div>
                         </div>`;
@@ -465,7 +737,14 @@
 
         const handEl = document.getElementById('p1-hand');
         handEl.innerHTML = '';
-        p1Hand.forEach((card, i) => {
+        if (gameMode === 'hotseat' && (hotseatStage === 'pass' || hotseatStage === 'resolve')) return;
+
+        const activeHand = currentHand();
+        const alreadyPlaced = gameMode === 'hotseat'
+            ? ((hotseatStage === 'p1' && hasPlayerStagedCard()) || (hotseatStage === 'p2' && hasAiStagedCard()))
+            : p1PlacedThisTurn;
+
+        activeHand.forEach((card, i) => {
             const cEl = document.createElement('div');
             cEl.className = `card ${card.color} ${selectedHandIndex === i ? 'selected' : ''} ${card.r === 'A' ? 'ace-card' : ''}`;
             cEl.innerHTML = `
@@ -473,21 +752,62 @@
                     <div class="card-rank-suit">${card.r}${card.suit}</div>
                 </div>
                 <div class="card-stock ${card.hp < card.maxHp && card.hp > 0 ? 'damaged' : ''}">${card.hp}</div>`;
-            cEl.onclick = () => { if(!isAnim && !p1PlacedThisTurn) {selectedHandIndex = i; render();} };
+            cEl.onclick = () => {
+                if (!isAnim && !alreadyPlaced) {
+                    selectedHandIndex = i;
+                    render();
+                }
+            };
             handEl.appendChild(cEl);
         });
     }
 
     function placeCard(r, c) {
-        if(isAnim || finalResolveMode || p1PlacedThisTurn || r !== playerStagingRow() || selectedHandIndex === null || board[r][c]) return;
+        if (isAnim || finalResolveMode || selectedHandIndex === null || board[r][c] || !isLaneActive(c)) return;
+
+        if (gameMode === 'hotseat') {
+            const owner = currentStageOwner();
+            const hand = currentHand();
+            const row = currentStageRow();
+
+            if (r !== row) return;
+            if ((owner === 1 && hasPlayerStagedCard()) || (owner === 2 && hasAiStagedCard())) return;
+
+            board[r][c] = { ...hand.splice(selectedHandIndex, 1)[0], p: owner };
+            markTrail(r, c, owner);
+
+            if (owner === 1) {
+                p1PlacedThisTurn = true;
+                lastPlacedCol = c;
+                if (p2Hand.length > 0) {
+                    hotseatStage = 'pass';
+                } else {
+                    hotseatStage = 'resolve';
+                }
+            } else {
+                p2PlacedThisTurn = true;
+                p2LastPlacedCol = c;
+                hotseatStage = 'resolve';
+            }
+
+            selectedHandIndex = null;
+            render();
+
+            if (document.getElementById('auto-toggle').checked && readyToAdvanceTurn()) {
+                setTimeout(resolveTurn, 400);
+            }
+            return;
+        }
+
+        if (p1PlacedThisTurn || r !== playerStagingRow()) return;
         board[r][c] = { ...p1Hand.splice(selectedHandIndex, 1)[0], p: 1 };
         markTrail(r, c, 1);
         lastPlacedCol = c;
         selectedHandIndex = null;
         p1PlacedThisTurn = true;
-        
+
         if (playerSide === 'blue') aiPlaceCard();
-        
+
         render();
 
         if(document.getElementById('auto-toggle').checked && readyToAdvanceTurn()) {
@@ -516,16 +836,27 @@
     }
 
     function aiPlaceCardNormal() {
-        if(p2Hand.length === 0) return;
-        let laneScores = [0,0,0,0,0,0];
-        for(let c=0; c<6; c++) {
-            for(let r=0; r<8; r++) {
-                if(board[r][c] && board[r][c].p === 2) laneScores[c]++;
+        if (p2Hand.length === 0) return;
+
+        const activeLanes = getActiveLanes();
+        const openLanes = activeLanes.filter(c => !board[0][c]);
+        if (!openLanes.length) return;
+
+        let bestLane = openLanes[0];
+        let bestScore = Infinity;
+
+        for (const c of openLanes) {
+            let score = 0;
+            for (let r = 0; r < 8; r++) {
+                if (board[r][c] && board[r][c].p === 2) score++;
             }
-            if(board[0][c]) laneScores[c] += 10;
+            if (score < bestScore) {
+                bestScore = score;
+                bestLane = c;
+            }
         }
-        let bestLane = laneScores.indexOf(Math.min(...laneScores));
-        p2Hand.sort((a,b) => b.v - a.v);
+
+        p2Hand.sort((a, b) => b.v - a.v);
         board[0][bestLane] = { ...p2Hand.shift(), p: 2 };
         markTrail(0, bestLane, 2);
     }
@@ -534,7 +865,7 @@
         if(p2Hand.length === 0) return;
 
         const legalLanes = [];
-        for (let c = 0; c < 6; c++) {
+        for (const c of getActiveLanes()) {
             if (!board[0][c]) legalLanes.push(c);
         }
         if (!legalLanes.length) return;
@@ -662,6 +993,7 @@
     }
 
     function aiPlaceCard() {
+        if (gameMode === 'hotseat') return;
         if (aiMode === 'cracked') aiPlaceCardCracked();
         else aiPlaceCardNormal();
     }
@@ -681,6 +1013,8 @@
         await processCombatAnims();
         advanceBoardLogic();
         p1PlacedThisTurn = false;
+        p2PlacedThisTurn = false;
+        selectedHandIndex = null;
 
         if (!finalResolveMode && (p1Hp <= 0 || p2Hp <= 0)) {
             finalResolveMode = true;
@@ -690,7 +1024,16 @@
 
         if (!finalResolveMode) {
             drawCards();
-            if(playerSide === 'red') aiPlaceCard();
+            if (gameMode === 'hotseat') {
+                if (playerSide === 'blue') hotseatStage = 'p1';
+                else hotseatStage = 'p2';
+
+                if (hotseatStage === 'p1' && p1Hand.length === 0 && p2Hand.length > 0) hotseatStage = 'pass';
+                if (hotseatStage === 'p2' && p2Hand.length === 0 && p1Hand.length > 0) hotseatStage = 'resolve';
+                if (p1Hand.length === 0 && p2Hand.length === 0) hotseatStage = 'resolve';
+            } else if(playerSide === 'red') {
+                aiPlaceCard();
+            }
         }
 
         render();
@@ -775,9 +1118,24 @@
                 } else if (b.r === 'A') {
                     a.hp = 0;
                 } else {
-                    let clash = Math.min(a.hp, b.hp);
-                    a.hp -= clash;
-                    b.hp -= clash;
+                    // Suit tie-breaker on equal current value only
+                    if (a.hp === b.hp) {
+                        if (suitSurpasses(a.suit, b.suit)) {
+                            a.hp = 1;
+                            b.hp = 0;
+                        } else if (suitSurpasses(b.suit, a.suit)) {
+                            a.hp = 0;
+                            b.hp = 1;
+                        } else {
+                            let clash = Math.min(a.hp, b.hp);
+                            a.hp -= clash;
+                            b.hp -= clash;
+                        }
+                    } else {
+                        let clash = Math.min(a.hp, b.hp);
+                        a.hp -= clash;
+                        b.hp -= clash;
+                    }
                 }
 
                 break;
@@ -835,6 +1193,8 @@
             const winnerColor = p1Hp > p2Hp ? p1ColorName : p2ColorName;
             winnerText.innerText = `${winnerColor} WINS!`;
             winnerText.style.color = winnerColor === 'BLUE' ? '#4dabf7' : '#ff6b6b';
+            overlay.classList.remove('winner-blue', 'winner-red');
+            overlay.classList.add(winnerColor === 'BLUE' ? 'winner-blue' : 'winner-red');
 
             if (!lethalSnapshot) lethalSnapshot = { p1: p1Hp, p2: p2Hp };
 
@@ -848,6 +1208,11 @@
             document.getElementById('next-btn').disabled = true;
         }
     }
+    document.querySelectorAll('input[name="game-mode"]').forEach(el => {
+        el.addEventListener('change', updateSideButtonState);
+    });
+    updateSideButtonState();
+
 </script>
 </body>
 </html>
