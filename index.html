@@ -71,9 +71,9 @@
         .board .card-rank-suit { position: absolute; right: 7px; top: 5px; font-size: 0.9rem; line-height: 1; text-align: right; }
         .board .card-stock { position: absolute; left: 50%; bottom: 4px; transform: translateX(-50%); font-size: 1.75rem; font-weight: 900; line-height: 1; color: inherit; }
         .card-stock.damaged { color: #00aa00; }
-        .hand .card-top { display: flex; flex-direction: column; align-items: center; justify-content: center; margin-top: 10px; line-height: 1; }
-        .hand .card-rank-suit { font-size: 1rem; }
-        .hand .card-stock { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -36%); font-size: 1.75rem; font-weight: 900; line-height: 1; color: inherit; }
+        .hand .card-top { position: absolute; top: 6px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; justify-content: flex-start; margin-top: 0; line-height: 1.05; }
+        .hand .card-rank-suit { font-size: 0.95rem; letter-spacing: 0.01em; }
+        .hand .card-stock { position: absolute; top: 62%; left: 50%; transform: translate(-50%, -50%); font-size: 1.65rem; font-weight: 900; line-height: 1; color: inherit; }
         .card.red-suit { color: #d63031; }
         .card.black-suit { color: #2d3436; }
         .ace-card { border: 2px solid #00aa00; box-shadow: 0 0 10px #00aa00 !important; }
@@ -317,10 +317,22 @@
         return board[row].some(cell => cell && cell.p === 2);
     }
 
+    function playerCanStageCard() {
+        return p1Hand.length > 0;
+    }
+
+    function aiCanStageCard() {
+        return p2Hand.length > 0;
+    }
+
     function readyToAdvanceTurn() {
         if (finalResolveMode) return true;
-        if (!p1PlacedThisTurn) return false;
-        return hasPlayerStagedCard() && hasAiStagedCard();
+
+        const playerReady = hasPlayerStagedCard() || !playerCanStageCard();
+        const aiReady = hasAiStagedCard() || !aiCanStageCard();
+
+        if (playerCanStageCard() && !p1PlacedThisTurn) return false;
+        return playerReady && aiReady;
     }
 
     function getTrailClass(owner) {
@@ -657,7 +669,10 @@
     async function resolveTurn() {
         if(isAnim || gameOverShown) return;
         if (!readyToAdvanceTurn()) {
-            if (!finalResolveMode) logMsg('Place a card in your staging row before ending the turn.');
+            if (!finalResolveMode) {
+                if (playerCanStageCard() && !hasPlayerStagedCard()) logMsg('Place a card in your staging row before ending the turn.');
+                else if (aiCanStageCard() && !hasAiStagedCard()) logMsg('Waiting for the AI to stage its card.');
+            }
             return;
         }
         isAnim = true;
