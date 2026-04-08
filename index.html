@@ -32,13 +32,18 @@
         #game-over.winner-red { border: 4px solid #ff6b6b; box-shadow: inset 0 0 0 2px rgba(255,107,107,0.25); }
         .side-btn h2 { margin: 10px 0; font-size: 2rem; }
         .side-btn p { font-size: 0.85rem; color: #aaa; text-align: center; }
-        #selection-screen h1 { margin: 6px 0 2px; font-size: clamp(2.2rem, 8vw, 4rem); line-height: 0.95; text-align: center; }
-        .mode-select-wrap { margin-top: 18px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+                .mode-select-wrap { margin-top: 18px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
         .mode-select-label { font-size: 0.9rem; letter-spacing: 0.08em; color: #aaa; text-transform: uppercase; }
         .mode-select { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
         .mode-option { display: flex; align-items: center; gap: 8px; background: #222; border: 1px solid #444; border-radius: 999px; padding: 8px 14px; color: #ddd; cursor: pointer; user-select: none; }
         .mode-option input { accent-color: #00aa00; }
         .mode-option:hover { border-color: #666; }
+
+        .format-select, .season-select { display: flex; gap: 12px; flex-wrap: nowrap; justify-content: center; align-items: center; }
+        .format-select .mode-option { min-width: 168px; justify-content: center; }
+        .season-select .mode-option { min-width: 112px; justify-content: center; }
+        .mode-option.ai-hidden { display: none; }
+        .pick-options-bottom { margin-top: 18px; }
 
         .pick-options { margin-top: 48px; display: flex; flex-direction: column; align-items: center; gap: 18px; }
         .pick-option-group { display: flex; flex-direction: column; align-items: center; gap: 10px; }
@@ -136,6 +141,131 @@
         .card.red-suit { color: #d63031; }
         .card.black-suit { color: #2d3436; }
         .ace-card { border: 2px solid #00aa00; box-shadow: 0 0 10px #00aa00 !important; }
+        .joker-card {
+            color: #111;
+            background: #fff;
+            border: 3px solid #000;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+            overflow: hidden;
+        }
+        .joker-card::before {
+            content: none;
+        }
+        .joker-glyph {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -53%);
+            font-family: "Palatino Linotype", "Book Antiqua", Garamond, Georgia, serif;
+            font-size: 3rem;
+            font-weight: 700;
+            font-style: normal;
+            line-height: 1;
+            color: #111;
+            text-shadow: none;
+            letter-spacing: -0.02em;
+        }
+        .board .joker-glyph { font-size: 2.08rem; }
+        .winter-board-flash {
+            animation: winterBoardFlash 0.42s ease-out;
+            background: rgba(255,255,255,0.96) !important;
+            border-color: rgba(255,255,255,0.98) !important;
+            box-shadow: 0 0 18px rgba(255,255,255,0.55);
+        }
+        @keyframes winterBoardFlash {
+            0% { background: rgba(255,255,255,0.05); box-shadow: 0 0 0 rgba(255,255,255,0.0); }
+            40% { background: rgba(255,255,255,0.98); box-shadow: 0 0 18px rgba(255,255,255,0.7); }
+            100% { background: rgba(255,255,255,0.00); box-shadow: 0 0 0 rgba(255,255,255,0.0); }
+        }
+
+        @keyframes ascensionPulse {
+            0% { transform: scale(1); box-shadow: 0 0 10px rgba(0,170,0,0.55); filter: brightness(1); }
+            35% { transform: scale(1.1); box-shadow: 0 0 22px rgba(80,255,80,0.9); filter: brightness(1.25); }
+            100% { transform: scale(1); box-shadow: 0 0 14px rgba(0,170,0,0.75); filter: brightness(1.05); }
+        }
+        @keyframes ascensionRing {
+            0% { transform: translate(-50%, -50%) scale(0.55); opacity: 0.95; }
+            100% { transform: translate(-50%, -50%) scale(1.55); opacity: 0; }
+        }
+        @keyframes ascensionLaneFlash {
+            0% {
+                background-color: inherit;
+                box-shadow: inset 0 0 0 0 rgba(110,255,140,0.0), 0 0 0 rgba(110,255,140,0.0);
+                filter: brightness(1);
+            }
+            22% {
+                background-color: rgba(70, 200, 95, 0.52);
+                box-shadow: inset 0 0 22px 8px rgba(150,255,170,0.58), 0 0 12px rgba(120,255,140,0.34);
+                filter: brightness(1.18);
+            }
+            100% {
+                background-color: inherit;
+                box-shadow: inset 0 0 0 0 rgba(110,255,140,0.0), 0 0 0 rgba(110,255,140,0.0);
+                filter: brightness(1);
+            }
+        }
+        @keyframes damageRowFlashBlue {
+            0% {
+                background-color: #1e2a38;
+                box-shadow: inset 0 0 0 0 rgba(255,107,107,0.0);
+                filter: brightness(1);
+            }
+            24% {
+                background-color: rgba(210, 72, 72, 0.72);
+                box-shadow: inset 0 0 18px 6px rgba(255,140,140,0.48);
+                filter: brightness(1.16);
+            }
+            100% {
+                background-color: #1e2a38;
+                box-shadow: inset 0 0 0 0 rgba(255,107,107,0.0);
+                filter: brightness(1);
+            }
+        }
+        @keyframes damageRowFlashRed {
+            0% {
+                background-color: #3a2525;
+                box-shadow: inset 0 0 0 0 rgba(77,171,247,0.0);
+                filter: brightness(1);
+            }
+            24% {
+                background-color: rgba(65, 126, 210, 0.72);
+                box-shadow: inset 0 0 18px 6px rgba(120,190,255,0.46);
+                filter: brightness(1.16);
+            }
+            100% {
+                background-color: #3a2525;
+                box-shadow: inset 0 0 0 0 rgba(77,171,247,0.0);
+                filter: brightness(1);
+            }
+        }
+        .cell.ascension-lane-flash {
+            animation: ascensionLaneFlash 0.42s ease-out;
+        }
+        .cell.damage-cell-flash-blue {
+            animation: damageRowFlashBlue 0.42s ease-out;
+        }
+        .cell.damage-cell-flash-red {
+            animation: damageRowFlashRed 0.42s ease-out;
+        }
+        .card.ascension-anim {
+            animation: ascensionPulse 0.65s ease-out;
+            z-index: 3;
+            overflow: visible;
+        }
+        .card.ascension-anim::after {
+            content: "";
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 74%;
+            height: 74%;
+            border-radius: 50%;
+            border: 2px solid rgba(120,255,120,0.9);
+            box-shadow: 0 0 12px rgba(120,255,120,0.6);
+            transform: translate(-50%, -50%) scale(0.55);
+            animation: ascensionRing 0.65s ease-out;
+            pointer-events: none;
+        }
         
         .border-blue { border-bottom: 4px solid #4dabf7; }
         .border-red { border-bottom: 4px solid #ff6b6b; }
@@ -194,6 +324,8 @@
             .mode-select-wrap { margin-top: 8px; gap: 8px; }
             .mode-select-label, .pick-option-label { font-size: 0.82rem; letter-spacing: 0.05em; }
             .mode-select { gap: 10px; }
+            .season-select { flex-wrap: wrap; }
+            .season-select .mode-option { min-width: 120px; }
             .mode-option { padding: 8px 12px; gap: 6px; }
             .select-box { gap: 14px; width: min(100%, 680px); margin-top: 20px; }
             .side-btn { width: calc(50vw - 22px); max-width: 190px; min-width: 146px; height: min(220px, 31vh); min-height: 180px; }
@@ -282,8 +414,8 @@
         input:checked + .slider { background-color: #00aa00; }
         input:checked + .slider:before { transform: translateX(16px); }
         @media (max-width: 460px) {
-            #selection-screen h1 { font-size: clamp(1.8rem, 9vw, 2.8rem); margin-top: 2px; }
             .mode-select { width: 100%; justify-content: center; }
+            .season-select { flex-wrap: wrap; }
             .mode-option { font-size: 0.92rem; }
             .select-box { gap: 10px; margin-top: 16px; }
             .side-btn { width: calc(50vw - 18px); min-width: 132px; height: min(200px, 28vh); min-height: 164px; }
@@ -298,42 +430,43 @@
 <body>
 
     <div id="selection-screen">
-        <h1>Pick...</h1>
         <div class="mode-select-wrap">
-            <div class="mode-select-label">Mode</div>
-            <div class="mode-select">
+            <div class="mode-select-label">Format</div>
+            <div class="mode-select format-select">
                 <label class="mode-option">
-                    <input type="radio" name="ai-mode" value="normal" checked>
-                    <span>Normal Mode</span>
+                    <input type="radio" name="rules-mode" value="ht52" checked>
+                    <span>HT52 Classic</span>
                 </label>
                 <label class="mode-option">
-                    <input type="radio" name="ai-mode" value="cracked">
-                    <span>Possibly Cracked Mode</span>
+                    <input type="radio" name="rules-mode" value="ht54">
+                    <span>HT54 Ascended</span>
                 </label>
-            </div>
-        </div>
-        <div class="select-box">
-            <div class="side-btn blue" id="blue-side-btn" onclick="startGame('blue')">
-                <h2>BLUE</h2>
-                <p>Moves First<br>Cards: Black</p>
-            </div>
-            <div class="side-btn red" id="red-side-btn" onclick="startGame('red')">
-                <h2>RED</h2>
-                <p>Moves Second<br>Cards: Red</p>
             </div>
         </div>
 
         <div class="pick-options">
             <div class="pick-option-group">
-                <div class="pick-option-label">Suit Functions</div>
-                <div class="pick-option-row">
-                    <label class="mode-option">
-                        <input type="radio" name="suit-mode" value="off" checked>
-                        <span>Off</span>
+                <div class="pick-option-label">Season</div>
+                <div class="pick-option-row season-select">
+                    <label class="mode-option ai-hidden" aria-hidden="true">
+                        <input type="radio" name="ai-mode" value="normal">
+                        <span>Normal</span>
                     </label>
                     <label class="mode-option">
-                        <input type="radio" name="suit-mode" value="on">
-                        <span>On</span>
+                        <input type="radio" name="ai-mode" value="spring" checked>
+                        <span>Spring</span>
+                    </label>
+                    <label class="mode-option">
+                        <input type="radio" name="ai-mode" value="summer">
+                        <span>Summer</span>
+                    </label>
+                    <label class="mode-option">
+                        <input type="radio" name="ai-mode" value="autumn">
+                        <span>Autumn</span>
+                    </label>
+                    <label class="mode-option">
+                        <input type="radio" name="ai-mode" value="winter">
+                        <span>Winter</span>
                     </label>
                 </div>
             </div>
@@ -351,7 +484,20 @@
                     </label>
                 </div>
             </div>
+        </div>
 
+        <div class="select-box">
+            <div class="side-btn blue" id="blue-side-btn" onclick="startGame('blue')">
+                <h2>BLUE</h2>
+                <p>Moves First<br>Cards: Black</p>
+            </div>
+            <div class="side-btn red" id="red-side-btn" onclick="startGame('red')">
+                <h2>RED</h2>
+                <p>Moves Second<br>Cards: Red</p>
+            </div>
+        </div>
+
+        <div class="pick-options pick-options-bottom">
             <div class="pick-option-group">
                 <div class="pick-option-label">Hotseat</div>
                 <div class="pick-option-row">
@@ -424,7 +570,7 @@
             <div class="auto-advance-wrap side-auto-wrap">
                 Auto
                 <label class="switch">
-                    <input type="checkbox" id="auto-toggle">
+                    <input type="checkbox" id="auto-toggle" checked>
                     <span class="slider"></span>
                 </label>
             </div>
@@ -466,11 +612,17 @@ function suitSurpasses(suitA, suitB) {
     let tileTrail = Array(8).fill(null).map(() => Array(6).fill(null));
     let selectedHandIndex = null, p1PlacedThisTurn = false, isAnim = false, lastPlacedCol = null;
     let playerSide = 'blue';
-    let aiMode = 'normal';
+    let aiMode = 'spring'; // legacy 'normal' kept hidden in UI
     let gameMode = 'ai';
     let laneMode = 'normal';
     let laneCount = 6;
     let suitFunctionsEnabled = false;
+    let ascensionModeEnabled = false;
+    let jokerModeEnabled = false;
+    let pendingAscension = null;
+    let pendingDamageCells = [];
+    let pendingJokerEffect = null;
+    let aiBackfillPlan = null;
     let finalResolveMode = false;
     let gameOverShown = false;
     let lethalSnapshot = null;
@@ -532,6 +684,7 @@ function suitSurpasses(suitA, suitB) {
         redBtn.classList.toggle('disabled', hotseatEnabledFromMenu());
     }
 
+
     function playerStagingRow() {
         return 7;
     }
@@ -582,14 +735,85 @@ function suitSurpasses(suitA, suitB) {
         if (r >= 0 && r < 8 && c >= 0 && c < 6) tileTrail[r][c] = owner;
     }
 
+    function makeJokerCard(colorClass) {
+        return {
+            r: 'JOKER',
+            v: 0,
+            suit: '',
+            color: colorClass,
+            maxHp: 0,
+            hp: 0,
+            isJoker: true,
+            uuid: self.crypto.randomUUID()
+        };
+    }
+
+    function shuffleInPlace(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+
+    function queueJokerEffect(type, meta = {}) {
+        pendingJokerEffect = { type, ...meta };
+    }
+
+    function queueAscension(cardUuid, row, col, owner) {
+        const laneCells = [];
+        const step = owner === 1 ? -1 : 1;
+        const boardLimit = owner === 1 ? 1 : 6;
+        for (let scanRow = row + step; scanRow >= 1 && scanRow <= 6; scanRow += step) {
+            laneCells.push({ row: scanRow, col });
+            if (scanRow === boardLimit) break;
+        }
+        pendingAscension = { uuid: cardUuid, row, col, owner, laneCells };
+    }
+
+    async function playAscensionAnimation() {
+        if (!pendingAscension) return;
+        render();
+        await new Promise(resolve => setTimeout(resolve, 700));
+        pendingAscension = null;
+        render();
+    }
+
+    async function playDamageFlashAnimation() {
+        if (!pendingDamageCells.length) return;
+        render();
+        await new Promise(resolve => setTimeout(resolve, 430));
+        pendingDamageCells = [];
+        render();
+    }
+
+    async function playJokerAnimation() {
+        if (!pendingJokerEffect) return;
+        render();
+        if (pendingJokerEffect.type === 'winter') {
+            await new Promise(resolve => setTimeout(resolve, 430));
+        } else if (['autumn', 'spring', 'summer'].includes(pendingJokerEffect.type)) {
+            await new Promise(resolve => setTimeout(resolve, 650));
+        }
+        pendingJokerEffect = null;
+        render();
+    }
+
     function startGame(side) {
         if (hotseatEnabledFromMenu() && side === 'red') return;
         playerSide = side;
-        aiMode = document.querySelector('input[name="ai-mode"]:checked')?.value || 'normal';
+        rulesMode = document.querySelector('input[name="rules-mode"]:checked')?.value || 'ht52';
+        aiMode = document.querySelector('input[name="ai-mode"]:checked')?.value || 'spring';
         gameMode = document.querySelector('input[name="game-mode"]:checked')?.value || 'ai';
         laneMode = document.querySelector('input[name="lane-mode"]:checked')?.value || 'normal';
         laneCount = laneMode === 'narrows' ? 3 : 6;
-        suitFunctionsEnabled = (document.querySelector('input[name="suit-mode"]:checked')?.value || 'off') === 'on';
+        suitFunctionsEnabled = true;
+        ascensionModeEnabled = rulesMode === 'ht54';
+        jokerModeEnabled = rulesMode === 'ht54';
+        pendingAscension = null;
+        pendingDamageCells = [];
+        pendingJokerEffect = null;
+        aiBackfillPlan = null;
 
         board = Array(8).fill(null).map(() => Array(6).fill(null));
         tileTrail = Array(8).fill(null).map(() => Array(6).fill(null));
@@ -597,7 +821,7 @@ function suitSurpasses(suitA, suitB) {
         p2Hand = [];
         p1Deck = [];
         p2Deck = [];
-        const startHp = (aiMode === 'cracked' && gameMode === 'ai') ? 30 : 20;
+        const startHp = ['spring', 'summer', 'autumn', 'winter'].includes(aiMode) ? 30 : 20;
         p1Hp = startHp;
         p2Hp = startHp;
         finalResolveMode = false;
@@ -628,6 +852,13 @@ function suitSurpasses(suitA, suitB) {
 
         const redCards = fullDeck.filter(c => c.color === 'red-suit').sort(() => Math.random() - 0.5);
         const blackCards = fullDeck.filter(c => c.color === 'black-suit').sort(() => Math.random() - 0.5);
+
+        if (jokerModeEnabled) {
+            redCards.push(makeJokerCard('red-suit'));
+            blackCards.push(makeJokerCard('black-suit'));
+            shuffleInPlace(redCards);
+            shuffleInPlace(blackCards);
+        }
 
         if (side === 'blue') {
             p1Deck = blackCards;
@@ -736,7 +967,16 @@ function suitSurpasses(suitA, suitB) {
                     }
                 }
                 const trailClass = getTrailClass(tileTrail[r][c]);
-                cell.className = `cell ${zoneClass} ${trailClass}`;
+                const isAscensionCell = !!(pendingAscension && (
+                    (pendingAscension.row === r && pendingAscension.col === c) ||
+                    pendingAscension.laneCells?.some(cell => cell.row === r && cell.col === c)
+                ));
+                const isDamageFlashCell = pendingDamageCells.some(cell => cell.row === r && cell.col === c);
+                const damageFlashClass = isDamageFlashCell
+                    ? (zoneClass === 'zone-blue' ? 'damage-cell-flash-blue' : zoneClass === 'zone-red' ? 'damage-cell-flash-red' : '')
+                    : '';
+                const winterFlashClass = pendingJokerEffect && pendingJokerEffect.type === 'winter' ? 'winter-board-flash' : '';
+                cell.className = `cell ${zoneClass} ${trailClass} ${isAscensionCell ? 'ascension-lane-flash' : ''} ${damageFlashClass} ${winterFlashClass}`;
                 cell.onclick = () => placeCard(r, c);
 
                 if (board[r][c]) {
@@ -749,12 +989,22 @@ function suitSurpasses(suitA, suitB) {
                         ? (card.p === 1 ? '↓' : '↑')
                         : (card.p === 1 ? '↑' : '↓');
 
-                    cell.innerHTML = `
-                        <div class="card ${card.color} ${borderClass} ${card.r === 'A' ? 'ace-card' : ''}" data-uuid="${card.uuid}">
+                    const ascensionClass = pendingAscension && pendingAscension.uuid === card.uuid ? 'ascension-anim' : '';
+                    const jokerMorphClass = pendingJokerEffect && ['autumn', 'spring', 'summer'].includes(pendingJokerEffect.type) && pendingJokerEffect.convertedUuids?.includes(card.uuid) ? 'ascension-anim' : '';
+                    if (card.isJoker) {
+                        cell.innerHTML = `
+                        <div class="card joker-card ${borderClass} ${ascensionClass}" data-uuid="${card.uuid}">
+                            <div class="card-dir">${dir}</div>
+                            <div class="joker-glyph">J</div>
+                        </div>`;
+                    } else {
+                        cell.innerHTML = `
+                        <div class="card ${card.color} ${borderClass} ${card.r === 'A' ? 'ace-card' : ''} ${ascensionClass} ${jokerMorphClass}" data-uuid="${card.uuid}">
                             <div class="card-dir">${dir}</div>
                             <div class="card-rank-suit">${card.r}${card.suit}</div>
-                            <div class="card-stock ${card.hp < card.maxHp && card.hp > 0 ? 'damaged' : ''}">${card.hp}</div>
+                            <div class="card-stock ${card.hp !== card.maxHp && card.hp > 0 ? 'damaged' : ''}">${card.hp}</div>
                         </div>`;
+                    }
                 }
                 boardEl.appendChild(cell);
             }
@@ -771,12 +1021,16 @@ function suitSurpasses(suitA, suitB) {
 
         activeHand.forEach((card, i) => {
             const cEl = document.createElement('div');
-            cEl.className = `card ${card.color} ${selectedHandIndex === i ? 'selected' : ''} ${card.r === 'A' ? 'ace-card' : ''}`;
-            cEl.innerHTML = `
+            cEl.className = `card ${card.color} ${selectedHandIndex === i ? 'selected' : ''} ${card.r === 'A' ? 'ace-card' : ''} ${card.isJoker ? 'joker-card' : ''}`;
+            if (card.isJoker) {
+                cEl.innerHTML = `<div class="joker-glyph">J</div>`;
+            } else {
+                cEl.innerHTML = `
                 <div class="card-top">
                     <div class="card-rank-suit">${card.r}${card.suit}</div>
                 </div>
-                <div class="card-stock ${card.hp < card.maxHp && card.hp > 0 ? 'damaged' : ''}">${card.hp}</div>`;
+                <div class="card-stock ${card.hp !== card.maxHp && card.hp > 0 ? 'damaged' : ''}">${card.hp}</div>`;
+            }
             cEl.onclick = () => {
                 if (!isAnim && !alreadyPlaced) {
                     selectedHandIndex = i;
@@ -886,140 +1140,419 @@ function suitSurpasses(suitA, suitB) {
         markTrail(0, bestLane, 2);
     }
 
-    function aiPlaceCardCracked() {
-        if(p2Hand.length === 0) return;
 
-        const legalLanes = [];
-        for (const c of getActiveLanes()) {
-            if (!board[0][c]) legalLanes.push(c);
+    function aiSeasonBias() {
+        const season = aiMode;
+        return {
+            spring: {
+                lowCardBonus: 10,
+                chipBonus: 11,
+                openLaneBonus: 8,
+                aceHoldBonus: 8,
+                ascensionBonus: 12,
+                backfillBonus: 4,
+                defenseBonus: 8,
+                dangerPenalty: 240,
+                suitTrapPenalty: 95,
+                crowdedAceBonus: 12,
+                stackedFollowBonus: 4,
+                pressureBonus: 7,
+                poisonLanePenalty: 280,
+                acePoisonLanePenalty: 360,
+                faceRaceBonus: 7,
+                highIntoOpenPenalty: 8,
+                preferredImperfectTop: 4
+            },
+            summer: {
+                lowCardBonus: 6,
+                chipBonus: 14,
+                openLaneBonus: 12,
+                aceHoldBonus: 4,
+                ascensionBonus: 14,
+                backfillBonus: 12,
+                defenseBonus: 6,
+                dangerPenalty: 225,
+                suitTrapPenalty: 90,
+                crowdedAceBonus: 19,
+                stackedFollowBonus: 12,
+                pressureBonus: 13,
+                poisonLanePenalty: 290,
+                acePoisonLanePenalty: 380,
+                faceRaceBonus: 12,
+                highIntoOpenPenalty: 5,
+                preferredImperfectTop: 5
+            },
+            autumn: {
+                lowCardBonus: 4,
+                chipBonus: 7,
+                openLaneBonus: 6,
+                aceHoldBonus: 8,
+                ascensionBonus: 24,
+                backfillBonus: 8,
+                defenseBonus: 10,
+                dangerPenalty: 255,
+                suitTrapPenalty: 120,
+                crowdedAceBonus: 15,
+                stackedFollowBonus: 7,
+                pressureBonus: 6,
+                poisonLanePenalty: 305,
+                acePoisonLanePenalty: 395,
+                faceRaceBonus: 6,
+                highIntoOpenPenalty: 8,
+                preferredImperfectTop: 4
+            },
+            winter: {
+                lowCardBonus: 3,
+                chipBonus: 5,
+                openLaneBonus: 4,
+                aceHoldBonus: 14,
+                ascensionBonus: 17,
+                backfillBonus: 6,
+                defenseBonus: 15,
+                dangerPenalty: 280,
+                suitTrapPenalty: 135,
+                crowdedAceBonus: 16,
+                stackedFollowBonus: 8,
+                pressureBonus: 4,
+                poisonLanePenalty: 330,
+                acePoisonLanePenalty: 420,
+                faceRaceBonus: 4,
+                highIntoOpenPenalty: 10,
+                preferredImperfectTop: 3
+            }
+        }[season] || {
+            lowCardBonus: 5, chipBonus: 7, openLaneBonus: 6, aceHoldBonus: 8,
+            ascensionBonus: 12, backfillBonus: 6, defenseBonus: 8,
+            dangerPenalty: 220, suitTrapPenalty: 90, crowdedAceBonus: 12, stackedFollowBonus: 6,
+            pressureBonus: 6, poisonLanePenalty: 280, acePoisonLanePenalty: 360,
+            faceRaceBonus: 6, highIntoOpenPenalty: 8, preferredImperfectTop: 4
+        };
+    }
+
+    function getStagedPlayerCard(lane) {
+        const card = board[7][lane];
+        return card && card.p === 1 ? card : null;
+    }
+
+    function countLaneOwner(lane, owner) {
+        let count = 0;
+        for (let r = 0; r < 8; r++) {
+            if (board[r][lane] && board[r][lane].p === owner) count++;
         }
-        if (!legalLanes.length) return;
+        return count;
+    }
 
-        const postureRoll = Math.random();
-        const posture =
-            postureRoll < 0.28 ? 'aggressive' :
-            postureRoll < 0.52 ? 'defensive' :
-            postureRoll < 0.76 ? 'opportunistic' : 'swarmy';
+    function strongestEnemyInLane(lane) {
+        let best = null;
+        for (let r = 0; r < 8; r++) {
+            const occ = board[r][lane];
+            if (!occ || occ.p !== 1) continue;
+            if (!best || occ.hp > best.hp) best = occ;
+        }
+        return best;
+    }
 
+    function aiLaneTail(lane) {
+        let tail = null;
+        for (let r = 0; r < 8; r++) {
+            const occ = board[r][lane];
+            if (occ && occ.p === 2) tail = occ;
+        }
+        return tail;
+    }
+
+    function findSafeAlternativeLanes(currentLane, legalLanes) {
+        return legalLanes.filter(lane => lane !== currentLane && !laneIsPoisonedForAi(lane));
+    }
+
+    function laneIsPoisonedForAi(lane) {
+        const staged = getStagedPlayerCard(lane);
+        if (!staged) return false;
+        if (staged.r === 'A') return true;
+        if (staged.v >= 10) return true;
+        return false;
+    }
+
+    function enemyCanBeatEqualOnSuit(enemyCard, aiCard) {
+        return suitFunctionsEnabled && enemyCard && aiCard && enemyCard.hp === aiCard.hp && suitSurpasses(enemyCard.suit, aiCard.suit);
+    }
+
+    function aiCanAscendAgainst(enemyCard, aiCard) {
+        return ascensionModeEnabled && suitFunctionsEnabled && enemyCard && aiCard &&
+            enemyCard.r !== 'A' && aiCard.r !== 'A' &&
+            enemyCard.hp === aiCard.hp && suitSurpasses(aiCard.suit, enemyCard.suit);
+    }
+
+    function laneIntelForAi(lane, card = null) {
+        let aiCount = 0, enemyCount = 0, nearestEnemy = null, nearestAi = null;
+        let enemyAceStaged = false, enemyHighStaged = false, enemySuitThreat = false;
+        let aiTail = null, laneDamagePotential = 0, crowdedEnemyValue = 0;
+
+        for (let r = 0; r < 8; r++) {
+            const occ = board[r][lane];
+            if (!occ) continue;
+            if (occ.p === 2) {
+                aiCount++;
+                aiTail = occ;
+                nearestAi = occ;
+            } else {
+                enemyCount++;
+                nearestEnemy = occ;
+                crowdedEnemyValue += occ.hp;
+                laneDamagePotential += occ.hp;
+            }
+        }
+
+        const stagedEnemy = getStagedPlayerCard(lane);
+        if (stagedEnemy) {
+            enemyAceStaged = stagedEnemy.r === 'A';
+            enemyHighStaged = stagedEnemy.v >= 10;
+            if (card && enemyCanBeatEqualOnSuit(stagedEnemy, card)) enemySuitThreat = true;
+        }
+
+        return {
+            aiCount,
+            enemyCount,
+            nearestEnemy,
+            nearestAi,
+            enemyAceStaged,
+            enemyHighStaged,
+            enemySuitThreat,
+            stagedEnemy,
+            aiTail,
+            laneDamagePotential,
+            crowdedEnemyValue,
+            openRunway: enemyCount === 0
+        };
+    }
+
+    function cardRole(card) {
+        if (card.isJoker) return 'joker';
+        if (card.r === 'A') return 'ace';
+        if (card.v <= 5) return 'low';
+        if (card.v <= 9) return 'mid';
+        return 'high';
+    }
+
+    function jokerScoreForLane(card, lane, bias, legalLanes) {
+        const info = laneIntelForAi(lane, card);
+        let score = 0;
+        if (aiMode === 'autumn') {
+            score += info.enemyCount * 18;
+            score += info.aiCount * 8;
+            if (info.stagedEnemy && info.stagedEnemy.r === 'A') score += 16;
+            if (info.crowdedEnemyValue >= 14) score += 14;
+            if (info.openRunway) score -= 22;
+            if (laneIsPoisonedForAi(lane)) score += 12;
+        } else if (aiMode === 'winter') {
+            const totalEnemy = p1Hand.length + board.flat().filter(c => c && c.p === 1).length;
+            const totalAi = p2Hand.length + board.flat().filter(c => c && c.p === 2).length;
+            score += (totalEnemy - totalAi) * 6;
+            score += Math.max(0, info.crowdedEnemyValue - 8);
+            if (p2Hp < p1Hp) score += 24;
+            if (board.flat().filter(c => c).length >= 6) score += 18;
+            if (p2Hp > p1Hp + 6) score -= 26;
+        } else {
+            score -= 60;
+        }
+        return score;
+    }
+
+    function cardScoreForLane(card, lane, bias, legalLanes) {
+        const info = laneIntelForAi(lane, card);
+        const role = cardRole(card);
+        const isJoker = role === 'joker';
+        const isAce = role === 'ace';
+        const isLow = role === 'low';
+        const isMid = role === 'mid';
+        const isHigh = role === 'high';
+        let score = 0;
+
+        if (isJoker) {
+            return jokerScoreForLane(card, lane, bias, legalLanes);
+        }
+
+        const safeAlternatives = findSafeAlternativeLanes(lane, legalLanes);
+        const otherSafeExists = safeAlternatives.length > 0;
+
+        if (info.enemyAceStaged) {
+            score -= bias.acePoisonLanePenalty;
+            if (isHigh || isAce) score -= 120;
+            if (isMid) score -= 55;
+            if (isLow) score += 10;
+            if (otherSafeExists) score -= 120;
+        } else if (info.enemyHighStaged) {
+            score -= bias.poisonLanePenalty;
+            if (isHigh) score -= 70;
+            if (isAce) score -= 40;
+            if (isLow) score += 8;
+            if (otherSafeExists) score -= 60;
+        }
+
+        if (info.enemySuitThreat) {
+            score -= bias.suitTrapPenalty;
+            if (isHigh) score -= 35;
+            if (otherSafeExists) score -= 24;
+        }
+
+        if (info.openRunway) {
+            score += bias.openLaneBonus;
+            score += bias.faceRaceBonus;
+            if (isLow) score += bias.lowCardBonus + bias.chipBonus + 5;
+            if (isMid) score += 4;
+            if (isHigh) score -= bias.highIntoOpenPenalty;
+            if (isAce) score -= bias.aceHoldBonus + 10;
+        }
+
+        if (info.enemyCount > 0 && !info.enemyAceStaged) {
+            score += bias.defenseBonus;
+            if (info.nearestEnemy) {
+                if (isAce) {
+                    score += info.enemyCount * bias.crowdedAceBonus;
+                    score += Math.min(30, info.crowdedEnemyValue);
+                    if (info.enemyCount >= 2) score += 18;
+                } else {
+                    if (card.hp > info.nearestEnemy.hp) score += 16;
+                    if (card.hp === info.nearestEnemy.hp) {
+                        if (aiCanAscendAgainst(info.nearestEnemy, card)) {
+                            score += bias.ascensionBonus + 18;
+                            if (info.enemyCount >= 2) score += 10;
+                        } else if (suitFunctionsEnabled && suitSurpasses(card.suit, info.nearestEnemy.suit)) {
+                            score += 8;
+                        } else if (suitFunctionsEnabled && suitSurpasses(info.nearestEnemy.suit, card.suit)) {
+                            score -= bias.suitTrapPenalty;
+                        }
+                    }
+                    if (card.hp < info.nearestEnemy.hp && info.nearestEnemy.r !== 'A') score -= 18;
+                }
+            }
+        }
+
+        if (info.aiCount > 0) {
+            score += bias.backfillBonus * Math.min(info.aiCount, 2);
+            if (info.aiTail && info.aiTail.r === 'A') {
+                if (isHigh) score += 24 + bias.stackedFollowBonus;
+                if (isMid) score += 12;
+                if (isLow) score -= 10;
+            } else if (info.aiTail && info.aiTail.v >= 10) {
+                if (isHigh) score += 10 + bias.stackedFollowBonus;
+                if (isMid) score += 5;
+            }
+        }
+
+        if (isAce) {
+            score += info.enemyCount * 8;
+            if (info.enemyCount >= 2) score += bias.crowdedAceBonus;
+            if (info.openRunway) score -= bias.aceHoldBonus;
+            if (!info.openRunway && info.crowdedEnemyValue >= 16) score += 12;
+            if (info.enemyCount === 1 && info.nearestEnemy && info.nearestEnemy.hp <= 4 && !info.enemyAceStaged) score -= 105;
+            if (info.enemyCount === 1 && info.crowdedEnemyValue <= 5 && !info.enemyHighStaged) score -= 70;
+            if (info.aiTail && info.aiTail.r === 'A' && info.enemyCount < 3 && !info.enemyAceStaged) score -= 190;
+            if (info.aiTail && info.aiTail.r === 'A' && info.crowdedEnemyValue < 12) score -= 120;
+        }
+
+        if (isHigh && info.enemyCount === 1 && info.nearestEnemy && info.nearestEnemy.hp <= 3 && !info.enemyHighStaged && !info.enemyAceStaged) {
+            score -= 18;
+        }
+
+        if (isLow && !info.enemyAceStaged) {
+            score += bias.chipBonus;
+            if (info.enemyCount === 0) score += 9;
+            if (info.aiCount === 0) score += 4;
+        }
+
+        if (isMid) score += 3;
+        if (isHigh && info.enemyCount > 0) score += 8;
+        if (isHigh && info.openRunway && !info.aiTail) score -= bias.highIntoOpenPenalty;
+        if (isHigh && info.stagedEnemy && info.stagedEnemy.r === 'A') score -= 140;
+
+        // reward denying the player's strongest pressure lane
+        const strongestEnemy = strongestEnemyInLane(lane);
+        if (strongestEnemy && strongestEnemy === info.nearestEnemy && strongestEnemy.hp >= 10 && !isLow) {
+            score += 8;
+        }
+
+        // seasonally reward development behind your own pressure
+        if (info.aiTail && info.aiTail.v >= 10 && !info.stagedEnemy) {
+            if (isHigh) score += bias.pressureBonus;
+            if (isMid) score += Math.floor(bias.pressureBonus / 2);
+        }
+
+        return score;
+    }
+
+    function chooseSeasonalMove(legalLanes) {
+        const bias = aiSeasonBias();
         const moves = [];
         for (let i = 0; i < p2Hand.length; i++) {
             const card = p2Hand[i];
             for (const lane of legalLanes) {
-                let score = 0;
-
-                // Base card role value
-                if (card.r === 'A') score -= 5;
-                else if (card.v <= 6) score += 1;
-                else if (card.v <= 10) score += 3;
-                else score += 5;
-
-                // Read lane state
-                let aiCount = 0, enemyCount = 0, nearestEnemyRow = -1, nearestEnemyHp = 0, furthestAiRow = -1;
-                let enemyAceInLane = false;
-                let enemyAceStaged = false;
-                for (let r = 0; r < 8; r++) {
-                    const occ = board[r][lane];
-                    if (!occ) continue;
-                    if (occ.p === 2) {
-                        aiCount++;
-                        furthestAiRow = Math.max(furthestAiRow, r);
-                    } else {
-                        enemyCount++;
-                        nearestEnemyRow = Math.max(nearestEnemyRow, r);
-                        nearestEnemyHp = occ.hp;
-                        if (occ.r === 'A') {
-                            enemyAceInLane = true;
-                            if (r >= 6) enemyAceStaged = true;
-                        }
-                    }
-                }
-
-                // Threat response
-                if (nearestEnemyRow >= 5) score += 8;
-                else if (nearestEnemyRow >= 3) score += 4;
-
-                // Hotfix: don't keep feeding a lane where the player staged an Ace.
-                // An Ace in the player's backline is a bad lane to dump into unless this is our only lane.
-                if (enemyAceStaged) {
-                    score -= 18;
-                    if (aiCount > 0) score -= 8;
-                    if (card.v >= 10 || card.r === 'A') score -= 6;
-                } else if (enemyAceInLane) {
-                    score -= 6;
-                }
-
-                // Pressure/open lane
-                if (enemyCount === 0) score += 4;
-                if (furthestAiRow >= 2 && enemyCount === 0) score += 5;
-
-                // Reinforcement / occasional flooding
-                if (aiCount > 0) {
-                    score += 1.5;
-                    if (furthestAiRow >= 2) score += 3;
-                    if (posture === 'swarmy') score += 1.5;
-                    if (aiCount >= 2) score -= 7; // don't clog too hard
-                }
-
-                // Lane congestion penalty
-                if (aiCount + enemyCount >= 3) score -= 3;
-                if (aiCount >= 3) score -= 9;
-
-                // Card-to-job efficiency
-                if (enemyCount === 0 && card.v >= 12) score -= 2; // don't waste top end into emptiness too much
-                if (nearestEnemyHp > 0) {
-                    const diff = card.hp - nearestEnemyHp;
-                    if (diff >= 0 && diff <= 3) score += 4;
-                    if (diff < -3) score -= 3;
-                }
-
-                // Ace as tactical bullet
-                if (card.r === 'A') {
-                    if (nearestEnemyHp >= 10) score += 14;
-                    else if (nearestEnemyHp >= 7) score += 8;
-                    else if (enemyCount === 0) score -= 8;
-                    if (p2Hp < p1Hp) score += 2;
-                }
-
-                // Posture bends
-                if (posture === 'aggressive') {
-                    if (enemyCount === 0) score += 3;
-                    if (furthestAiRow >= 2) score += 2;
-                } else if (posture === 'defensive') {
-                    if (nearestEnemyRow >= 4) score += 4;
-                    if (enemyCount > 0) score += 2;
-                } else if (posture === 'opportunistic') {
-                    if (nearestEnemyHp >= 10) score += 4;
-                    if (card.r === 'A') score += 2;
-                }
-
-                // Small noise so it doesn't feel deterministic
-                score += Math.random() * 2.5;
-
-                moves.push({ handIndex: i, lane, score });
+                moves.push({
+                    handIndex: i,
+                    lane,
+                    score: cardScoreForLane(card, lane, bias, legalLanes),
+                    role: cardRole(card)
+                });
             }
         }
-
         moves.sort((a, b) => b.score - a.score);
-        const top = moves.slice(0, Math.min(4, moves.length));
-        const weights = top.map((m, idx) => Math.max(1, [55, 25, 12, 8][idx] + (m.score - top[top.length - 1].score)));
-        let roll = Math.random() * weights.reduce((a, b) => a + b, 0);
-        let chosen = top[0];
-        for (let i = 0; i < top.length; i++) {
-            roll -= weights[i];
-            if (roll <= 0) {
-                chosen = top[i];
-                break;
-            }
-        }
+
+        // Hard sanity filter: unless trapped, do not feed a staged enemy Ace/high lane with premium cards.
+        const notPoisoned = moves.filter(move => {
+            const info = laneIntelForAi(move.lane, p2Hand[move.handIndex]);
+            if (!laneIsPoisonedForAi(move.lane)) return true;
+            if (legalLanes.every(l => laneIsPoisonedForAi(l))) return true;
+            return move.role === 'low' || move.role === 'joker';
+        });
+
+        let usable = notPoisoned.length ? notPoisoned : moves;
+
+        const antiWaste = usable.filter(move => {
+            if (move.role !== 'ace') return true;
+            const info = laneIntelForAi(move.lane, p2Hand[move.handIndex]);
+            if (legalLanes.length === 1) return true;
+            if (info.enemyAceStaged) return true;
+            if (info.enemyCount >= 2) return true;
+            if (info.crowdedEnemyValue >= 10) return true;
+            if (info.aiTail && info.aiTail.r === 'A') return false;
+            if (info.enemyCount === 1 && info.nearestEnemy && info.nearestEnemy.hp <= 4) return false;
+            if (info.openRunway) return false;
+            return true;
+        });
+        if (antiWaste.length) usable = antiWaste;
+
+        const topN = aiSeasonBias().preferredImperfectTop || 4;
+        const top = usable.slice(0, Math.min(topN, usable.length));
+        const imperfectRoll = Math.random();
+        if (!top.length) return null;
+        if (imperfectRoll < 0.70) return top[0];
+        if (imperfectRoll < 0.87 && top[1]) return top[1];
+        if (imperfectRoll < 0.95 && top[2]) return top[2];
+        return top[Math.floor(Math.random() * top.length)];
+    }
+
+    function aiPlaceCardSeasonal() {
+        if (p2Hand.length === 0) return;
+        const legalLanes = getActiveLanes().filter(c => !board[0][c]);
+        if (!legalLanes.length) return;
+
+        const chosen = chooseSeasonalMove(legalLanes);
+        if (!chosen) return;
 
         const picked = p2Hand.splice(chosen.handIndex, 1)[0];
         board[0][chosen.lane] = { ...picked, p: 2 };
         markTrail(0, chosen.lane, 2);
     }
 
+    function aiPlaceCardCracked() {
+        aiPlaceCardSeasonal();
+    }
+
     function aiPlaceCard() {
         if (gameMode === 'hotseat') return;
-        if (aiMode === 'cracked') aiPlaceCardCracked();
+        const seasonalModes = ['spring', 'summer', 'autumn', 'winter'];
+        if (seasonalModes.includes(aiMode)) aiPlaceCardSeasonal();
+        else if (aiMode === 'cracked') aiPlaceCardCracked();
         else aiPlaceCardNormal();
     }
 
@@ -1037,6 +1570,9 @@ function suitSurpasses(suitA, suitB) {
 
         await processCombatAnims();
         advanceBoardLogic();
+        await playJokerAnimation();
+        await playDamageFlashAnimation();
+        await playAscensionAnimation();
         p1PlacedThisTurn = false;
         p2PlacedThisTurn = false;
         selectedHandIndex = null;
@@ -1108,8 +1644,68 @@ function suitSurpasses(suitA, suitB) {
         if(found) await new Promise(r => setTimeout(r, 600));
     }
 
+    function applyAutumnJokerToLane(col) {
+        return col
+            .filter(card => !card.isJoker)
+            .map(card => ({
+                ...card,
+                // Preserve suit, allegiance, color class, and animation identity.
+                r: '6',
+                v: 6,
+                maxHp: 6,
+                hp: 6
+            }));
+    }
+
+    function valueToRank(value) {
+        if (value === 11) return 'J';
+        if (value === 12) return 'Q';
+        if (value === 13) return 'K';
+        return String(value);
+    }
+
+    function applySpringJokerToMatrix(matrix, owner) {
+        const convertedUuids = [];
+        for (let r = 1; r <= 6; r++) {
+            for (let c = 0; c < 6; c++) {
+                const card = matrix[r][c];
+                if (!card || card.isJoker || card.p !== owner || card.r === 'A') continue;
+                const boosted = Math.min(13, (card.hp || 0) + 2);
+                matrix[r][c] = {
+                    ...card,
+                    hp: boosted
+                };
+                convertedUuids.push(matrix[r][c].uuid);
+            }
+        }
+        return convertedUuids;
+    }
+
+    function applySummerJokerToMatrix(matrix) {
+        const convertedUuids = [];
+        for (let r = 1; r <= 6; r++) {
+            for (let c = 0; c < 6; c++) {
+                const card = matrix[r][c];
+                if (!card || card.isJoker) continue;
+                const updated = (card.hp || 0) - 1;
+                convertedUuids.push(card.uuid);
+                if (updated <= 0) {
+                    matrix[r][c] = null;
+                } else {
+                    matrix[r][c] = {
+                        ...card,
+                        hp: updated
+                    };
+                }
+            }
+        }
+        return convertedUuids;
+    }
+
     function advanceBoardLogic() {
         let next = Array(8).fill(null).map(() => Array(6).fill(null));
+        const damageCellsThisResolve = [];
+        let winterTriggered = false;
 
         for(let c=0; c<6; c++) {
             let col = [];
@@ -1121,6 +1717,57 @@ function suitSurpasses(suitA, suitB) {
                     col.push(card);
                 }
             }
+
+            const jokerCards = col.filter(card => card.isJoker && ((card.p === 1 && card.cr === 7) || (card.p === 2 && card.cr === 0)));
+            if (jokerCards.length) {
+                for (const joker of jokerCards) {
+                    col = col.filter(card => card.uuid !== joker.uuid);
+
+                    if (aiMode === 'spring') {
+                        const convertedSet = new Set([
+                            ...applySpringJokerToMatrix(board, joker.p),
+                            ...applySpringJokerToMatrix(next, joker.p)
+                        ]);
+                        col = col.map(card => {
+                            if (card.isJoker || card.p !== joker.p || card.r === 'A') return card;
+                            const boosted = Math.min(13, (card.hp || 0) + 2);
+                            convertedSet.add(card.uuid);
+                            return {
+                                ...card,
+                                hp: boosted
+                            };
+                        });
+                        queueJokerEffect('spring', { owner: joker.p, convertedUuids: Array.from(convertedSet) });
+                        logMsg('Joker: Spring empowers all of the triggering player\'s board cards by +2.');
+                    } else if (aiMode === 'summer') {
+                        const convertedSet = new Set([
+                            ...applySummerJokerToMatrix(board),
+                            ...applySummerJokerToMatrix(next)
+                        ]);
+                        col = col.map(card => {
+                            if (card.isJoker) return card;
+                            const updatedHp = (card.hp || 0) - 1;
+                            convertedSet.add(card.uuid);
+                            if (updatedHp <= 0) return null;
+                            return { ...card, hp: updatedHp };
+                        }).filter(Boolean);
+                        queueJokerEffect('summer', { owner: joker.p, convertedUuids: Array.from(convertedSet) });
+                        logMsg('Joker: Summer scorches every card on the board for 1 damage.');
+                    } else if (aiMode === 'autumn') {
+                        col = applyAutumnJokerToLane(col);
+                        queueJokerEffect('autumn', { col: c, owner: joker.p, convertedUuids: col.map(card => card.uuid) });
+                        logMsg('Joker: Autumn equalizes every card in the lane to a six.');
+                    } else if (aiMode === 'winter') {
+                        winterTriggered = true;
+                        queueJokerEffect('winter', { col: c, owner: joker.p });
+                        logMsg('Joker: Winter wipes the board clean.');
+                    } else {
+                        logMsg('Joker spent with no seasonal effect.');
+                    }
+                }
+            }
+
+            if (winterTriggered) continue;
 
             // Frontline-only combat: only the nearest opposing contact pair in a lane resolves.
             for(let i=0; i<col.length - 1; i++) {
@@ -1146,11 +1793,27 @@ function suitSurpasses(suitA, suitB) {
                     // Suit tie-breaker on equal current value only
                     if (a.hp === b.hp) {
                         if (suitSurpasses(a.suit, b.suit)) {
-                            a.hp = 1;
                             b.hp = 0;
+                            if (ascensionModeEnabled) {
+                                a.r = 'A';
+                                a.v = 14;
+                                a.maxHp = 1;
+                                a.hp = 1;
+                                queueAscension(a.uuid, a.cr, c, a.p);
+                            } else {
+                                a.hp = 1;
+                            }
                         } else if (suitSurpasses(b.suit, a.suit)) {
                             a.hp = 0;
-                            b.hp = 1;
+                            if (ascensionModeEnabled) {
+                                b.r = 'A';
+                                b.v = 14;
+                                b.maxHp = 1;
+                                b.hp = 1;
+                                queueAscension(b.uuid, b.cr, c, b.p);
+                            } else {
+                                b.hp = 1;
+                            }
                         } else {
                             let clash = Math.min(a.hp, b.hp);
                             a.hp -= clash;
@@ -1171,9 +1834,11 @@ function suitSurpasses(suitA, suitB) {
 
                 if(card.p === 1 && card.nr === 0) {
                     p2Hp -= card.hp;
+                    damageCellsThisResolve.push({ row: 0, col: c });
                 }
                 else if(card.p === 2 && card.nr === 7) {
                     p1Hp -= card.hp;
+                    damageCellsThisResolve.push({ row: 7, col: c });
                 }
                 else if(card.nr >= 0 && card.nr <= 7) {
                     if(!next[card.nr][c]) {
@@ -1187,7 +1852,15 @@ function suitSurpasses(suitA, suitB) {
             });
         }
 
+        if (winterTriggered) {
+            board = Array(8).fill(null).map(() => Array(6).fill(null));
+            pendingDamageCells = [];
+            pendingAscension = null;
+            return;
+        }
+
         board = next;
+        pendingDamageCells = damageCellsThisResolve;
     }
 
     function logMsg(m) {
